@@ -1,5 +1,3 @@
-package pr3;
-
 public class SensorData extends InterfaceComponentData {
     
     private String units;

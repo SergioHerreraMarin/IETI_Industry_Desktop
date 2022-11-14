@@ -1,5 +1,3 @@
-package pr3;
-
 public abstract class InterfaceComponentData {
     
     private String id;

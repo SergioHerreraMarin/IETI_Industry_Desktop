@@ -1,5 +1,3 @@
-package pr3;
-
 public class SwitchData extends InterfaceComponentData {
     
     private String defaultValue;

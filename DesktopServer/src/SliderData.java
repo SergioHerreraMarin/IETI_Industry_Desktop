@@ -1,5 +1,3 @@
-package pr3;
-
 public class SliderData extends InterfaceComponentData {
     
     private float defaultValue;

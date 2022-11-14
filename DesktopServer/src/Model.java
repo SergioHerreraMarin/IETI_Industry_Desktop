@@ -1,12 +1,8 @@
-package pr3;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -15,7 +11,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 public class Model {
     private File currentFile;
@@ -53,7 +48,7 @@ public class Model {
                 
                 Document doc = documentBuilder.parse(currentFile);
                 doc.getDocumentElement().normalize();
-                
+
                 //Bucle de controles
                 NodeList nodelistControls = doc.getElementsByTagName("controls");        
                 for(int i = 0; i < nodelistControls.getLength(); i++){
@@ -68,6 +63,7 @@ public class Model {
                     }
 
                     //Bucle de slider
+
                     NodeList nodelistSlider = elementControls.getElementsByTagName("slider");
                     
                     for(int k = 0; k < nodelistSlider.getLength(); k++){
@@ -109,16 +105,11 @@ public class Model {
             	JFrame jFrame = new JFrame();
                 JOptionPane.showMessageDialog(jFrame, "Aware of! Don't put letters and special characters where they don't belong, also be careful with the titles of the variables.\n"+e.getMessage());
             }
-            
-            
-            
-
             readCurrentData();          
         }
         else{
         	JFrame jFrame = new JFrame();
-            JOptionPane.showMessageDialog(jFrame, "There is no XML loaded");
-
+          JOptionPane.showMessageDialog(jFrame, "There is no XML loaded");
         }
     }
 
@@ -179,10 +170,7 @@ public class Model {
                         JOptionPane.showMessageDialog(jFrame, "The ID must be a number!!!\n"+e.getMessage());
                         break;
 					}
-                    System.out.println("\nDropdown - ID: " + ((DropdownData)mapData.get(key)).getId() + ", Default: " + ((DropdownData)mapData.get(key)).getDefaultValue() + ", Block: " + ((DropdownData)mapData.get(key)).getBlock() + ", Options:");
-                    for(String option : ((DropdownData)mapData.get(key)).getOptions()){
-                        System.out.println(option);
-                    }
+                    System.out.println("\nSwitch - ID: " + ((SwitchData)mapData.get(key)).getId() + ", Default: " + ((SwitchData)mapData.get(key)).getDefaultValue() + ", Label: " + ((SwitchData)mapData.get(key)).getLabel() + ", Block: " + ((SwitchData)mapData.get(key)).getBlock());
                 break;
                 case "sensor":
                 	try {
@@ -217,8 +205,8 @@ public class Model {
         }
 
     }
-
 	/**Función que devuelve el tipo de componente a través de la ID*/
+
     private String returnIDType(String id){
         String type = "-1";
         String[] stringArray  = id.split("-");

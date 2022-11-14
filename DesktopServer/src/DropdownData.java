@@ -1,5 +1,3 @@
-package pr3;
-
 import java.util.ArrayList;
 
 public class DropdownData extends InterfaceComponentData {
