@@ -1,6 +1,11 @@
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -70,22 +75,17 @@ public class Servidor extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-
         System.out.println(message);
     }
 
     @Override
     public void onMessage(WebSocket conn, ByteBuffer message) {
-
-        // Enviem el missatge del client a tothom
-        broadcast(message.array());
-
-        // Mostrem per pantalla (servidor) el missatge
-        System.out.println(conn + ": " + message);
+        System.out.println(bytesToObject(message).toString());
     }
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
+        ex.printStackTrace();
         System.out.println("\nERROR\n");
     }
 
@@ -100,5 +100,43 @@ public class Servidor extends WebSocketServer {
     public String getConnectionId(WebSocket connection) {
         String name = connection.toString();
         return name.replaceAll("org.java_websocket.WebSocketImpl@", "").substring(0, 3);
+    }
+
+    // Método para transformar el ArrayList de credenciales al Servidor
+    public static byte[] objToBytes(Object obj) {
+        byte[] result = null;
+        try {
+            // Transforma l'objecte a bytes[]
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(obj);
+            oos.flush();
+            result = bos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static Object bytesToObject(ByteBuffer arr) {
+        Object result = null;
+        try {
+            // Transforma el ByteButter en byte[]
+            byte[] bytesArray = new byte[arr.remaining()];
+            arr.get(bytesArray, 0, bytesArray.length);
+
+            // Transforma l'array de bytes en objecte
+            ByteArrayInputStream in = new ByteArrayInputStream(bytesArray);
+            ObjectInputStream is = new ObjectInputStream(in);
+            return is.readObject();
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
