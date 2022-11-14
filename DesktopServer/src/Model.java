@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -222,7 +224,7 @@ public class Model {
     }
 
     /**Función que devuelve el tipo de componente a través de la ID*/
-    private String returnIDType(String id){
+    public String returnIDType(String id){
         String type = "-1";
         String[] stringArray  = id.split("-");
         if(stringArray.length != 2){
