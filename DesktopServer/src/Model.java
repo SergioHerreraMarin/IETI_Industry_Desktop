@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,10 +14,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+
 public class Model {
     
     private File currentFile;
     private HashMap<String, InterfaceComponentData> mapData = new HashMap<String, InterfaceComponentData>();
+    private HashMap<String, ControlPanel> controlBlockData = new HashMap<String, ControlPanel>();
 
     public Model(){
 
@@ -38,6 +42,11 @@ public class Model {
         this.mapData = mapData;
     }
 
+
+    public HashMap<String, ControlPanel> getControlBlockData(){
+        return this.controlBlockData;
+    }
+
     
     public void readXML(){
 
@@ -49,12 +58,18 @@ public class Model {
                 
                 Document doc = documentBuilder.parse(currentFile);
                 doc.getDocumentElement().normalize();
-            
+                
                 //Bucle de controles
-                NodeList nodelistControls = doc.getElementsByTagName("controls");        
+                NodeList nodelistControls = doc.getElementsByTagName("controls");   
                 for(int i = 0; i < nodelistControls.getLength(); i++){
 
                     Element elementControls = (Element) nodelistControls.item(i);
+
+                    Border border = BorderFactory.createTitledBorder(elementControls.getAttribute("name"));
+                    ControlPanel controlPanel = new ControlPanel(elementControls.getAttribute("name"));
+                    controlPanel.setBorder(border);
+                    controlBlockData.put(elementControls.getAttribute("name"), controlPanel);
+                    
                     
                     //Bucle de switches
                     NodeList nodelistSwitch = elementControls.getElementsByTagName("switch");   
@@ -62,7 +77,7 @@ public class Model {
                         Element elementSwitch = (Element)nodelistSwitch.item(j); //Current switch    
                         mapData.put("switch-" + elementSwitch.getAttribute("id"), new SwitchData(elementSwitch.getAttribute("id"), elementControls.getAttribute("name"), elementSwitch.getTextContent(), elementSwitch.getAttribute("default")));
                     }
-
+                    
                     //Bucle de slider
                     NodeList nodelistSlider = elementControls.getElementsByTagName("slider");   
                     for(int k = 0; k < nodelistSlider.getLength(); k++){
@@ -139,7 +154,7 @@ public class Model {
     }
 
     /**Función que devuelve el tipo de componente a través de la ID*/
-    private String returnIDType(String id){
+    public String returnIDType(String id){
         String type = "-1";
         String[] stringArray  = id.split("-");
         if(stringArray.length != 2){
@@ -149,5 +164,11 @@ public class Model {
         }
         return type;
     }
+
+    
+
+    
+    
+
 
 }

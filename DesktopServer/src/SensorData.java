@@ -24,7 +24,6 @@ public class SensorData extends InterfaceComponentData {
         return thresholdhigh;
     }
 
-
     public void setUnits(String units) {
         this.units = units;
     }
