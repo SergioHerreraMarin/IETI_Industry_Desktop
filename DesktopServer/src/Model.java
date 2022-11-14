@@ -29,7 +29,7 @@ public class Model {
     public File getCurrentFile() {
         return currentFile;
     }
-
+    
     public void setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
         readXML();
@@ -179,15 +179,18 @@ public class Model {
                 	}
                     break;
                 case "dropdown":
-                	try {
-                		Integer.parseInt(((DropdownData)mapData.get(key)).getId());
-					} catch (NumberFormatException e) {
-						// TODO: handle exception
-						JFrame jFrame = new JFrame();
+                    try {
+                        Integer.parseInt(((DropdownData)mapData.get(key)).getId());
+                    } catch (NumberFormatException e) {
+                        // TODO: handle exception
+                        JFrame jFrame = new JFrame();
                         JOptionPane.showMessageDialog(jFrame, "The ID must be a number!!!\n"+e.getMessage());
                         break;
-					}
-                    System.out.println("\nSwitch - ID: " + ((SwitchData)mapData.get(key)).getId() + ", Default: " + ((SwitchData)mapData.get(key)).getDefaultValue() + ", Label: " + ((SwitchData)mapData.get(key)).getLabel() + ", Block: " + ((SwitchData)mapData.get(key)).getBlock());
+                    }
+                    System.out.println("\nDropdown - ID: " + ((DropdownData)mapData.get(key)).getId() + ", Default: " + ((DropdownData)mapData.get(key)).getDefaultValue() + ", Block: " + ((DropdownData)mapData.get(key)).getBlock() + ", Options:");
+                    for(String option : ((DropdownData)mapData.get(key)).getOptions()){
+                        System.out.println(option);
+                    }
                 break;
                 case "sensor":
                 	try {
