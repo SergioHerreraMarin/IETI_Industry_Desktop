@@ -20,7 +20,7 @@ import org.xml.sax.SAXException;
 public class Model {
     private File currentFile;
     private HashMap<String, InterfaceComponentData> mapData = new HashMap<String, InterfaceComponentData>();
-    private HashMap<String, ControlPanel> controlBlockData = new HashMap<String, ControlPanel>();
+    private ArrayList<ControlPanel> controlBlockData = new ArrayList<ControlPanel>();
 
     public Model(){
 
@@ -30,9 +30,9 @@ public class Model {
         return currentFile;
     }
     
-    public void setCurrentFile(File currentFile) {
+    public boolean setCurrentFile(File currentFile) {
         this.currentFile = currentFile;
-        readXML();
+        return readXML();
     }
 
     public HashMap<String, InterfaceComponentData> getMapData() {
@@ -44,12 +44,12 @@ public class Model {
     }
 
 
-    public HashMap<String, ControlPanel> getControlBlockData(){
+    public ArrayList<ControlPanel> getControlBlockData(){
         return this.controlBlockData;
     }
 
     
-    public void readXML(){
+    public boolean readXML(){
 
         if(currentFile != null){
             
@@ -65,13 +65,12 @@ public class Model {
                 for(int i = 0; i < nodelistControls.getLength(); i++){
 
                     Element elementControls = (Element) nodelistControls.item(i);
-
+                    
                     Border border = BorderFactory.createTitledBorder(elementControls.getAttribute("name"));
                     ControlPanel controlPanel = new ControlPanel(elementControls.getAttribute("name"));
                     controlPanel.setBorder(border);
-                    controlBlockData.put(elementControls.getAttribute("name"), controlPanel);
-                    
-                    
+                    controlBlockData.add(controlPanel);
+                                
                     //Bucle de switches
                     NodeList nodelistSwitch = elementControls.getElementsByTagName("switch");   
                     for(int j = 0; j < nodelistSwitch.getLength(); j++){
@@ -80,9 +79,7 @@ public class Model {
                     }
                     
                     //Bucle de slider
-
-                    NodeList nodelistSlider = elementControls.getElementsByTagName("slider");
-                    
+                    NodeList nodelistSlider = elementControls.getElementsByTagName("slider");     
                     for(int k = 0; k < nodelistSlider.getLength(); k++){
                         Element elementSlider = (Element)nodelistSlider.item(k); //Current switch    
                         mapData.put("slider-" + elementSlider.getAttribute("id"), new SliderData(elementSlider.getAttribute("id"), elementControls.getAttribute("name"), elementSlider.getTextContent(), Float.parseFloat(elementSlider.getAttribute("default")), Float.parseFloat(elementSlider.getAttribute("min")), Float.parseFloat(elementSlider.getAttribute("max")), Float.parseFloat(elementSlider.getAttribute("step"))));
@@ -113,21 +110,27 @@ public class Model {
 
             } catch (ParserConfigurationException e) {
                 e.printStackTrace();
+                return false;
             } catch (SAXException e) {
             	JFrame jFrame = new JFrame();
                 JOptionPane.showMessageDialog(jFrame, "Remember to put the labels right!\n"+e.getMessage());
+                return false;
             } catch (IOException e) {
                 e.printStackTrace();
+                return false;
             } catch (NumberFormatException e) {
             	JFrame jFrame = new JFrame();
                 JOptionPane.showMessageDialog(jFrame, "Aware of! Don't put letters and special characters where they don't belong, also be careful with the titles of the variables.\n"+e.getMessage());
+                return false;
             }
             readCurrentData();          
         }
         else{
         	JFrame jFrame = new JFrame();
-          JOptionPane.showMessageDialog(jFrame, "There is no XML loaded");
+            JOptionPane.showMessageDialog(jFrame, "There is no XML loaded");
+            return false;
         }
+        return true;
     }
 
 
@@ -224,6 +227,12 @@ public class Model {
 
         }
 
+    }
+
+
+    public void resetData(){
+        mapData.clear();
+        controlBlockData.clear();
     }
 
     /**Función que devuelve el tipo de componente a través de la ID*/

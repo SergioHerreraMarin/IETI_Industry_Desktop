@@ -79,12 +79,14 @@ public class UserInterface extends JFrame {
 
         switch(chooserStatus){
             case JFileChooser.APPROVE_OPTION:
-                model.setCurrentFile(fileChooser.getSelectedFile());
-                loadControls();
+                model.resetData();
+                if(model.setCurrentFile(fileChooser.getSelectedFile())){
+                    loadControls();
+                }
             break;
         }
     }
-
+    
     
     private void loadControls(){
 
@@ -93,17 +95,17 @@ public class UserInterface extends JFrame {
                 
                 case "switch":
                     JToggleButton toggleButton = new JToggleButton();
-                    if(((SwitchData)model.getMapData().get(key)).getDefaultValue().equals("true")){
+                    if(((SwitchData)model.getMapData().get(key)).getDefaultValue().equals("on")){
                         toggleButton.setSelected(true);
                     }else{
                         toggleButton.setSelected(false);
                     }
                     toggleButton.setText(((SwitchData)model.getMapData().get(key)).getLabel());
 
-                    for(String key2: model.getControlBlockData().keySet()){
-                        if(key2.equals(((SwitchData)model.getMapData().get(key)).getBlock())){
-                            model.getControlBlockData().get(key2).addToggleToPanel(toggleButton);
-                        }
+                    for(ControlPanel controlPanel : model.getControlBlockData()){
+                        if(controlPanel.getControlId().equals(((SwitchData)model.getMapData().get(key)).getBlock())){
+                            controlPanel.addToggleToPanel(toggleButton);
+                        }     
                     }
             
                 break;
@@ -114,11 +116,12 @@ public class UserInterface extends JFrame {
                     slider.setMinimum((int)((SliderData)model.getMapData().get(key)).getMin());
                     slider.setMajorTickSpacing((int)((SliderData)model.getMapData().get(key)).getStep());
 
-                    for(String key2: model.getControlBlockData().keySet()){
-                        if(key2.equals(((SliderData)model.getMapData().get(key)).getBlock())){
-                            model.getControlBlockData().get(key2).addSlidersToPanel(slider);
-                        }
+                    for(ControlPanel controlPanel : model.getControlBlockData()){
+                        if(controlPanel.getControlId().equals(((SliderData)model.getMapData().get(key)).getBlock())){
+                            controlPanel.addSlidersToPanel(slider);
+                        }     
                     }
+
                 break;
                 case "dropdown":
                     JComboBox dropdown = new JComboBox<>();
@@ -127,10 +130,10 @@ public class UserInterface extends JFrame {
                     }
                     dropdown.setSelectedIndex((int)((DropdownData)model.getMapData().get(key)).getDefaultValue());
 
-                    for(String key2: model.getControlBlockData().keySet()){
-                        if(key2.equals(((DropdownData)model.getMapData().get(key)).getBlock())){
-                            model.getControlBlockData().get(key2).addDropdownToPanel(dropdown);
-                        }
+                    for(ControlPanel controlPanel : model.getControlBlockData()){
+                        if(controlPanel.getControlId().equals(((DropdownData)model.getMapData().get(key)).getBlock())){
+                            controlPanel.addDropdownToPanel(dropdown);
+                        }     
                     }
                 break;
                 case "sensor":
@@ -144,21 +147,23 @@ public class UserInterface extends JFrame {
                     thresholdhigh.setText("Thresholdhigh: " + ((SensorData)model.getMapData().get(key)).getThresholdhigh());
                     sensorLabel.setText("Label: " + ((SensorData)model.getMapData().get(key)).getLabel());
 
-                    for(String key2: model.getControlBlockData().keySet()){
-                        if(key2.equals(((SensorData)model.getMapData().get(key)).getBlock())){
-                            model.getControlBlockData().get(key2).addSensorToPanel(unitsData);
-                            model.getControlBlockData().get(key2).addSensorToPanel(thresholdlow);
-                            model.getControlBlockData().get(key2).addSensorToPanel(thresholdhigh);
-                            model.getControlBlockData().get(key2).addSensorToPanel(sensorLabel);
-                        }
+                    for(ControlPanel controlPanel : model.getControlBlockData()){
+                        if(controlPanel.getControlId().equals(((SensorData)model.getMapData().get(key)).getBlock())){
+                            controlPanel.addSensorToPanel(unitsData);
+                            controlPanel.addSensorToPanel(thresholdlow);
+                            controlPanel.addSensorToPanel(thresholdhigh);
+                            controlPanel.addSensorToPanel(sensorLabel);
+                        }     
                     }
                 break;
             }
         }
 
-        for(String key: model.getControlBlockData().keySet()){ //Añade los paneles de control al panel exterior. 
-            panelExterior.add(((model.getControlBlockData().get(key))));     
+        //Añade los paneles de control al panel exterior. 
+        for(ControlPanel controlPanel : model.getControlBlockData()){
+            panelExterior.add(controlPanel);   
         }
+
     }
 
     private void initInterface(){
