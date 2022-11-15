@@ -1,12 +1,14 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -90,20 +92,72 @@ public class UserInterface extends JFrame {
     
     private void loadControls(){
 
+        for(JComponent component : model.getCustomComponents()){
+
+            if(component instanceof CustomSlider){
+
+                JSlider slider = ((CustomSlider)component).createCustomSlider();           
+                for(CustomControlPanel controlPanel : model.getControlBlockData()){
+                    if(controlPanel.getControlId().equals(((CustomSlider) component).getBlock())){
+                        controlPanel.addSlidersToPanel(slider);
+                    }     
+                }
+
+            }else if(component instanceof CustomSwitch){
+
+                JToggleButton tggleButtonn = ((CustomSwitch)component).createCustomSwitch();
+                for(CustomControlPanel controlPanel : model.getControlBlockData()){
+                    if(controlPanel.getControlId().equals(((CustomSwitch) component).getBlock())){
+                        controlPanel.addToggleToPanel(tggleButtonn);
+                    }     
+                }
+
+            }else if(component instanceof CustomDropdown){
+
+                JComboBox dropdown = ((CustomDropdown)component).createCustomDropdown();
+                for(CustomControlPanel controlPanel : model.getControlBlockData()){
+                    if(controlPanel.getControlId().equals(((CustomDropdown) component).getBlock())){
+                        controlPanel.addDropdownToPanel(dropdown);
+                    }     
+                }
+
+            }else if(component instanceof CustomSensor){
+
+                ArrayList<JLabel> sensorData = ((CustomSensor)component).createCustomSensor();
+
+                for(CustomControlPanel controlPanel : model.getControlBlockData()){
+                    if(controlPanel.getControlId().equals(((CustomSensor) component).getBlock())){ 
+                        for(JLabel data : sensorData){
+                            controlPanel.addSensorToPanel(data);
+                        }
+                    }     
+                }
+
+            }else{
+                System.out.println("Clase no encontrada");
+            }
+        }
+
+        //Añade los paneles de control al panel exterior. 
+        for(CustomControlPanel controlPanel : model.getControlBlockData()){
+            panelExterior.add(controlPanel);   
+        }
+
+        /* 
         for(String key : model.getMapData().keySet()){
             switch(model.returnIDType(key)){
                 
                 case "switch":
                     JToggleButton toggleButton = new JToggleButton();
-                    if(((SwitchData)model.getMapData().get(key)).getDefaultValue().equals("on")){
+                    if(((CustomSwitch)model.getMapData().get(key)).getDefaultValue().equals("on")){
                         toggleButton.setSelected(true);
                     }else{
                         toggleButton.setSelected(false);
                     }
-                    toggleButton.setText(((SwitchData)model.getMapData().get(key)).getLabel());
+                    toggleButton.setText(((CustomSwitch)model.getMapData().get(key)).getLabel());
 
                     for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((SwitchData)model.getMapData().get(key)).getBlock())){
+                        if(controlPanel.getControlId().equals(((CustomSwitch)model.getMapData().get(key)).getBlock())){
                             controlPanel.addToggleToPanel(toggleButton);
                         }     
                     }
@@ -111,13 +165,13 @@ public class UserInterface extends JFrame {
                 break;
                 case "slider":
                     JSlider slider = new JSlider();
-                    slider.setValue((int)((SliderData)model.getMapData().get(key)).getDefaultValue());
-                    slider.setMaximum((int)((SliderData)model.getMapData().get(key)).getMax());
-                    slider.setMinimum((int)((SliderData)model.getMapData().get(key)).getMin());
-                    slider.setMajorTickSpacing((int)((SliderData)model.getMapData().get(key)).getStep());
+                    slider.setValue((int)((CustomSlider)model.getMapData().get(key)).getDefaultValue());
+                    slider.setMaximum((int)((CustomSlider)model.getMapData().get(key)).getMax());
+                    slider.setMinimum((int)((CustomSlider)model.getMapData().get(key)).getMin());
+                    slider.setMajorTickSpacing((int)((CustomSlider)model.getMapData().get(key)).getStep());
 
                     for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((SliderData)model.getMapData().get(key)).getBlock())){
+                        if(controlPanel.getControlId().equals(((CustomSlider)model.getMapData().get(key)).getBlock())){
                             controlPanel.addSlidersToPanel(slider);
                         }     
                     }
@@ -125,13 +179,13 @@ public class UserInterface extends JFrame {
                 break;
                 case "dropdown":
                     JComboBox dropdown = new JComboBox<>();
-                    for(String option : ((DropdownData)model.getMapData().get(key)).getOptions()){
+                    for(String option : ((CustomDropdown)model.getMapData().get(key)).getOptions()){
                         dropdown.addItem(option);
                     }
-                    dropdown.setSelectedIndex((int)((DropdownData)model.getMapData().get(key)).getDefaultValue());
+                    dropdown.setSelectedIndex((int)((CustomDropdown)model.getMapData().get(key)).getDefaultValue());
 
                     for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((DropdownData)model.getMapData().get(key)).getBlock())){
+                        if(controlPanel.getControlId().equals(((CustomDropdown)model.getMapData().get(key)).getBlock())){
                             controlPanel.addDropdownToPanel(dropdown);
                         }     
                     }
@@ -142,13 +196,13 @@ public class UserInterface extends JFrame {
                     JLabel thresholdhigh = new JLabel();
                     JLabel sensorLabel = new JLabel();
 
-                    unitsData.setText("Units: " + ((SensorData)model.getMapData().get(key)).getUnits());
-                    thresholdlow.setText("Thresholdlow: " + ((SensorData)model.getMapData().get(key)).getThresholdlow());
-                    thresholdhigh.setText("Thresholdhigh: " + ((SensorData)model.getMapData().get(key)).getThresholdhigh());
-                    sensorLabel.setText("Label: " + ((SensorData)model.getMapData().get(key)).getLabel());
+                    unitsData.setText("Units: " + ((CustomSensor)model.getMapData().get(key)).getUnits());
+                    thresholdlow.setText("Thresholdlow: " + ((CustomSensor)model.getMapData().get(key)).getThresholdlow());
+                    thresholdhigh.setText("Thresholdhigh: " + ((CustomSensor)model.getMapData().get(key)).getThresholdhigh());
+                    sensorLabel.setText("Label: " + ((CustomSensor)model.getMapData().get(key)).getLabel());
 
                     for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((SensorData)model.getMapData().get(key)).getBlock())){
+                        if(controlPanel.getControlId().equals(((CustomSensor)model.getMapData().get(key)).getBlock())){
                             controlPanel.addSensorToPanel(unitsData);
                             controlPanel.addSensorToPanel(thresholdlow);
                             controlPanel.addSensorToPanel(thresholdhigh);
@@ -163,7 +217,7 @@ public class UserInterface extends JFrame {
         for(ControlPanel controlPanel : model.getControlBlockData()){
             panelExterior.add(controlPanel);   
         }
-
+        */
     }
 
     private void initInterface(){

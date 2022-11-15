@@ -7,12 +7,12 @@ import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 import java.awt.GridLayout;
 
-public class ControlPanel extends JPanel {
+public class CustomControlPanel extends JPanel {
     
     private String controlId;
 
     JPanel panelSliders = new JPanel(new GridLayout(1,0));
-    JPanel panelDropdown = new JPanel(new GridLayout(1,0));
+    JPanel panelDropdown = new JPanel(new GridLayout(0,1));
     JPanel panelToggles = new JPanel(new GridLayout(1,0));
     JPanel panelSensor = new JPanel(new GridLayout(1,0));
     JPanel panelSliderComponent = new JPanel();
@@ -21,7 +21,7 @@ public class ControlPanel extends JPanel {
     JPanel panelSensorComponent = new JPanel(new GridLayout(0,1));
 
 
-    public ControlPanel(String controlId) {
+    public CustomControlPanel(String controlId) {
         this.controlId = controlId;
         this.setLayout(new GridLayout(1,0));
 

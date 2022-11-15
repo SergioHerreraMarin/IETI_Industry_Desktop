@@ -1,9 +1,9 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.border.Border;
@@ -18,9 +18,11 @@ import org.xml.sax.SAXException;
 
 
 public class Model {
+
     private File currentFile;
-    private HashMap<String, InterfaceComponentData> mapData = new HashMap<String, InterfaceComponentData>();
-    private ArrayList<ControlPanel> controlBlockData = new ArrayList<ControlPanel>();
+    private ArrayList<CustomControlPanel> controlBlockData = new ArrayList<CustomControlPanel>();
+    private ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
+
 
     public Model(){
 
@@ -35,16 +37,16 @@ public class Model {
         return readXML();
     }
 
-    public HashMap<String, InterfaceComponentData> getMapData() {
-        return mapData;
+    public ArrayList<JComponent> getCustomComponents() {
+        return customComponents;
     }
 
-    public void setMapData(HashMap<String, InterfaceComponentData> mapData) {
-        this.mapData = mapData;
+    public void setCustomComponents(ArrayList<JComponent> customComponents) {
+        this.customComponents = customComponents;
     }
 
 
-    public ArrayList<ControlPanel> getControlBlockData(){
+    public ArrayList<CustomControlPanel> getControlBlockData(){
         return this.controlBlockData;
     }
 
@@ -67,7 +69,7 @@ public class Model {
                     Element elementControls = (Element) nodelistControls.item(i);
                     
                     Border border = BorderFactory.createTitledBorder(elementControls.getAttribute("name"));
-                    ControlPanel controlPanel = new ControlPanel(elementControls.getAttribute("name"));
+                    CustomControlPanel controlPanel = new CustomControlPanel(elementControls.getAttribute("name"));
                     controlPanel.setBorder(border);
                     controlBlockData.add(controlPanel);
                                 
@@ -75,21 +77,30 @@ public class Model {
                     NodeList nodelistSwitch = elementControls.getElementsByTagName("switch");   
                     for(int j = 0; j < nodelistSwitch.getLength(); j++){
                         Element elementSwitch = (Element)nodelistSwitch.item(j); //Current switch    
-                        mapData.put("switch-" + elementSwitch.getAttribute("id"), new SwitchData(elementSwitch.getAttribute("id"), elementControls.getAttribute("name"), elementSwitch.getTextContent(), elementSwitch.getAttribute("default")));
+
+                        CustomSwitch customSwitch = new CustomSwitch(elementSwitch.getAttribute("id"), elementControls.getAttribute("name"), elementSwitch.getTextContent(), elementSwitch.getAttribute("default"));
+                        customComponents.add(customSwitch);
                     }
                     
                     //Bucle de slider
                     NodeList nodelistSlider = elementControls.getElementsByTagName("slider");     
                     for(int k = 0; k < nodelistSlider.getLength(); k++){
                         Element elementSlider = (Element)nodelistSlider.item(k); //Current switch    
-                        mapData.put("slider-" + elementSlider.getAttribute("id"), new SliderData(elementSlider.getAttribute("id"), elementControls.getAttribute("name"), elementSlider.getTextContent(), Float.parseFloat(elementSlider.getAttribute("default")), Float.parseFloat(elementSlider.getAttribute("min")), Float.parseFloat(elementSlider.getAttribute("max")), Float.parseFloat(elementSlider.getAttribute("step"))));
+                        
+                        CustomSlider customSlider = new CustomSlider(elementSlider.getAttribute("id"), elementControls.getAttribute("name"), elementSlider.getTextContent(),Float.parseFloat(elementSlider.getAttribute("default")), Float.parseFloat(elementSlider.getAttribute("min")), Float.parseFloat(elementSlider.getAttribute("max")), Float.parseFloat(elementSlider.getAttribute("step")));
+
+                        customComponents.add(customSlider);
                     }
                     
                     //Bucle sensor
                     NodeList nodelistSensor = elementControls.getElementsByTagName("sensor");
                     for(int l = 0; l < nodelistSensor.getLength(); l++){
                         Element elementSensor = (Element)nodelistSensor.item(l); //Current switch  
-                        mapData.put("sensor-" + elementSensor.getAttribute("id"), new SensorData(elementSensor.getAttribute("id"), elementControls.getAttribute("name"), elementSensor.getTextContent(), elementSensor.getAttribute("units"), elementSensor.getAttribute("thresholdlow"), elementSensor.getAttribute("thresholdhigh")));
+                    
+                        CustomSensor customSensor = new CustomSensor(elementSensor.getAttribute("id"), elementControls.getAttribute("name"), elementSensor.getTextContent(), elementSensor.getAttribute("units"), elementSensor.getAttribute("thresholdlow"), elementSensor.getAttribute("thresholdhigh"));
+                        
+                        customComponents.add(customSensor);
+                    
                     }
                     
                     //Bucle dropdown
@@ -103,8 +114,10 @@ public class Model {
                             Element elementOption = (Element)nodelistOptions.item(n);
                             optionsArrayList.add(elementOption.getTextContent());
                         }
-
-                        mapData.put("dropdown-" + elementDropdown.getAttribute("id"), new DropdownData(elementDropdown.getAttribute("id"), elementControls.getAttribute("name"), elementDropdown.getTextContent(), Integer.parseInt(elementDropdown.getAttribute("default")), optionsArrayList));
+                    
+                        CustomDropdown customDropdown = new CustomDropdown(elementDropdown.getAttribute("id"), elementControls.getAttribute("name"), elementDropdown.getTextContent(), Integer.parseInt(elementDropdown.getAttribute("default")), optionsArrayList);
+                        
+                        customComponents.add(customDropdown);
                     }
                 }
 
@@ -123,7 +136,7 @@ public class Model {
                 JOptionPane.showMessageDialog(jFrame, "Aware of! Don't put letters and special characters where they don't belong, also be careful with the titles of the variables.\n"+e.getMessage());
                 return false;
             }
-            readCurrentData();          
+         
         }
         else{
         	JFrame jFrame = new JFrame();
@@ -133,7 +146,7 @@ public class Model {
         return true;
     }
 
-
+/* 
     private void readCurrentData(){
 
         for(String key : mapData.keySet()){
@@ -141,7 +154,7 @@ public class Model {
             switch(returnIDType(key)){
                 case "switch":
                 	try {
-                		Integer.parseInt(((SwitchData)mapData.get(key)).getId());
+                		Integer.parseInt(((CustomSwitch)mapData.get(key)).getId());
                 		
 					} catch (NumberFormatException e) {
 						// TODO: handle exception
@@ -150,9 +163,9 @@ public class Model {
                         break;
 					}
                 	try {
-                		String control = ((SwitchData)mapData.get(key)).getDefaultValue();
+                		String control = ((CustomSwitch)mapData.get(key)).getDefaultValue();
 						if(control.equals("off") || control.equals("on")) {
-							System.out.println("\nSwitch - ID: " + ((SwitchData)mapData.get(key)).getId() + ", Default: " + ((SwitchData)mapData.get(key)).getDefaultValue() + ", Label: " + ((SwitchData)mapData.get(key)).getLabel() + ", Block: " + ((SwitchData)mapData.get(key)).getBlock());
+							System.out.println("\nSwitch - ID: " + ((CustomSwitch)mapData.get(key)).getId() + ", Default: " + ((CustomSwitch)mapData.get(key)).getDefaultValue() + ", Label: " + ((CustomSwitch)mapData.get(key)).getLabel() + ", Block: " + ((CustomSwitch)mapData.get(key)).getBlock());
 						}
 						else {
 							throw new Exception();
@@ -165,39 +178,39 @@ public class Model {
                     break;
                 case "slider":
                 	try {
-                		Integer.parseInt(((SliderData)mapData.get(key)).getId());
+                		Integer.parseInt(((CustomSlider)mapData.get(key)).getId());
 					} catch (NumberFormatException e) {
 						// TODO: handle exception
 						JFrame jFrame = new JFrame();
                         JOptionPane.showMessageDialog(jFrame, "Watch the variables, you have to put numbers!!!\n"+e.getMessage());
                         break;
 					}
-                	if (((SliderData)mapData.get(key)).getDefaultValue()<((SliderData)mapData.get(key)).getMin() || ((SliderData)mapData.get(key)).getDefaultValue() > ((SliderData)mapData.get(key)).getMax()) {
+                	if (((CustomSlider)mapData.get(key)).getDefaultValue()<((CustomSlider)mapData.get(key)).getMin() || ((CustomSlider)mapData.get(key)).getDefaultValue() > ((CustomSlider)mapData.get(key)).getMax()) {
                 		JFrame jFrame = new JFrame();
                         JOptionPane.showMessageDialog(jFrame, "The default number of the slider is not within the established parameters");
                 	}	
                 	else{
-                		System.out.println("\nSlider - ID: " + ((SliderData)mapData.get(key)).getId() + ", Default: " + ((SliderData)mapData.get(key)).getDefaultValue() + ", Min: " + ((SliderData)mapData.get(key)).getMin() + ", Max: " + ((SliderData)mapData.get(key)).getMax() + ", Step: " + ((SliderData)mapData.get(key)).getStep() + ", Label: " + ((SliderData)mapData.get(key)).getLabel() + ", Block: " + ((SliderData)mapData.get(key)).getBlock());
+                		System.out.println("\nSlider - ID: " + ((CustomSlider)mapData.get(key)).getId() + ", Default: " + ((CustomSlider)mapData.get(key)).getDefaultValue() + ", Min: " + ((CustomSlider)mapData.get(key)).getMin() + ", Max: " + ((CustomSlider)mapData.get(key)).getMax() + ", Step: " + ((CustomSlider)mapData.get(key)).getStep() + ", Label: " + ((CustomSlider)mapData.get(key)).getLabel() + ", Block: " + ((CustomSlider)mapData.get(key)).getBlock());
 
                 	}
                     break;
                 case "dropdown":
                     try {
-                        Integer.parseInt(((DropdownData)mapData.get(key)).getId());
+                        Integer.parseInt(((CustomDropdown)mapData.get(key)).getId());
                     } catch (NumberFormatException e) {
                         // TODO: handle exception
                         JFrame jFrame = new JFrame();
                         JOptionPane.showMessageDialog(jFrame, "The ID must be a number!!!\n"+e.getMessage());
                         break;
                     }
-                    System.out.println("\nDropdown - ID: " + ((DropdownData)mapData.get(key)).getId() + ", Default: " + ((DropdownData)mapData.get(key)).getDefaultValue() + ", Block: " + ((DropdownData)mapData.get(key)).getBlock() + ", Options:");
-                    for(String option : ((DropdownData)mapData.get(key)).getOptions()){
+                    System.out.println("\nDropdown - ID: " + ((CustomDropdown)mapData.get(key)).getId() + ", Default: " + ((CustomDropdown)mapData.get(key)).getDefaultValue() + ", Block: " + ((CustomDropdown)mapData.get(key)).getBlock() + ", Options:");
+                    for(String option : ((CustomDropdown)mapData.get(key)).getOptions()){
                         System.out.println(option);
                     }
                 break;
                 case "sensor":
                 	try {
-                		Integer.parseInt(((SensorData)mapData.get(key)).getId());
+                		Integer.parseInt(((CustomSensor)mapData.get(key)).getId());
 					} catch (NumberFormatException e) {
 						// TODO: handle exception
 						JFrame jFrame = new JFrame();
@@ -205,9 +218,9 @@ public class Model {
                         break;
 					}
                 	try {
-						String control = ((SensorData)mapData.get(key)).getUnits();
+						String control = ((CustomSensor)mapData.get(key)).getUnits();
 						if (control.equals("ºC")) {
-							System.out.println("\nSensor - ID: " + ((SensorData)mapData.get(key)).getId() + ", Units: " + ((SensorData)mapData.get(key)).getUnits() + ", Thresholdlow: " + ((SensorData)mapData.get(key)).getThresholdlow() + ", Thresholdhigh: " + ((SensorData)mapData.get(key)).getThresholdhigh() + ", Label: " + ((SensorData)mapData.get(key)).getLabel() + ", Block: " + ((SensorData)mapData.get(key)).getBlock());
+							System.out.println("\nSensor - ID: " + ((CustomSensor)mapData.get(key)).getId() + ", Units: " + ((CustomSensor)mapData.get(key)).getUnits() + ", Thresholdlow: " + ((CustomSensor)mapData.get(key)).getThresholdlow() + ", Thresholdhigh: " + ((CustomSensor)mapData.get(key)).getThresholdhigh() + ", Label: " + ((CustomSensor)mapData.get(key)).getLabel() + ", Block: " + ((CustomSensor)mapData.get(key)).getBlock());
 						}
 						else {
 							throw new Exception();
@@ -228,15 +241,15 @@ public class Model {
         }
 
     }
-
+    */
 
     public void resetData(){
-        mapData.clear();
+        customComponents.clear();
         controlBlockData.clear();
     }
 
     /**Función que devuelve el tipo de componente a través de la ID*/
-    public String returnIDType(String id){
+    /*public String returnIDType(String id){
         String type = "-1";
         String[] stringArray  = id.split("-");
         if(stringArray.length != 2){
@@ -246,12 +259,7 @@ public class Model {
             type = stringArray[0]; //Se queda con el tipo
         }
         return type;
-    }
+    }*/
 
     
-
-    
-    
-
-
 }
