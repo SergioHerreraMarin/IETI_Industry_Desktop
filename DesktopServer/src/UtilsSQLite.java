@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class UtilsSQLite {
 
@@ -13,8 +14,11 @@ public class UtilsSQLite {
         queryUpdate(conn, "DROP TABLE IF EXISTS user;");
         queryUpdate(conn, "CREATE TABLE IF NOT EXISTS user ("
                 + "	id integer PRIMARY KEY AUTOINCREMENT,"
-                + "	nom varchar(15) NOT NULL,"
-                + "	contrasenya varchar(50) NOT NULL );");
+                + "	name varchar(15) NOT NULL,"
+                + "	password varchar(50) NOT NULL );");
+
+        queryUpdate(conn,
+                "INSERT INTO user (name, password) VALUES (\"admin\",  \"hola123\");");
     }
 
     public static Connection connect(String filePath) {
@@ -27,12 +31,25 @@ public class UtilsSQLite {
                 DatabaseMetaData meta = conn.getMetaData();
                 System.out.println("BBDD driver: " + meta.getDriverName());
             }
-            System.out.println("BBDD SQLite connectada");
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return conn;
+    }
+
+    public static ArrayList<String> listTables(Connection conn) {
+        ArrayList<String> list = new ArrayList<>();
+
+        try {
+            ResultSet rs = conn.getMetaData().getTables(null, null, null, null);
+            while (rs.next()) {
+                list.add(rs.getString("TABLE_NAME"));
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return list;
     }
 
     public static void disconnect(Connection conn) {

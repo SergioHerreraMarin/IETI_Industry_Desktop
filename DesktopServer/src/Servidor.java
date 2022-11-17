@@ -3,6 +3,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -55,8 +58,6 @@ public class Servidor extends WebSocketServer {
         // Saludem personalment al nou client
         conn.send("Benvingut a IETI Industry");
 
-        // Enviem la direcció URI del nou client a tothom
-        System.out.println("\nOK\n");
         broadcast("Nova connexió: " + handshake.getResourceDescriptor());
 
         // Mostrem per pantalla (servidor) la nova connexió
@@ -76,7 +77,32 @@ public class Servidor extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        System.out.println(message);
+        try {
+            if (message.contains("UC")) {
+
+                UtilsSQLite.iniciarDB(filePath);
+                Connection connection = UtilsSQLite.connect(filePath);
+
+                String[] userInfo = message.split("#");
+                String username = userInfo[1];
+                String password = userInfo[2];
+
+                ResultSet rs = UtilsSQLite.querySelect(connection, "SELECT * FROM user");
+
+                while (rs.next()) {
+                    if (rs.getString("name").equals(username) && rs.getString("password").equals(password)) {
+                        broadcast("V");
+                    } else {
+                        broadcast("NV");
+                    }
+                }
+            } else if (message.contains("XMLC")) {
+
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+
     }
 
     @Override
