@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Random;
+import com.password4j.Password;
 
 public class UtilsSQLite {
 
@@ -19,6 +21,46 @@ public class UtilsSQLite {
 
         queryUpdate(conn,
                 "INSERT INTO user (name, password) VALUES (\"admin\",  \"hola123\");");
+
+        queryUpdate(conn, "CREATE TABLE IF NOT EXISTS salts (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, salt varchar(500));");
+
+        queryUpdate(conn, "CREATE TABLE IF NOT EXISTS peppers (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, pepper varchar(500));");
+    }
+
+    public static int randomInt(int min, int max) {
+        Random random = new Random();
+        return random.nextInt(max - min) + min;
+    }
+
+    public static String randomChars() {
+        String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+
+        String cadena = "";
+        for (int i = 0; i < 6; i++) {
+            int index = randomInt(0, chars.length() - 1);
+            char randomChar = chars.charAt(index);
+            cadena += randomChar;
+        }
+        return cadena;
+    }
+
+    public static String encriptar(Connection conn, String input) {
+        String pwdSalt = randomChars();
+        String pwdPepper = randomChars();
+
+        queryUpdate(conn, "INSERT INTO salts (salt) VALUES (\"" + pwdSalt + "\");");
+        queryUpdate(conn, "INSERT INTO peppers (pepper) VALUES (\"" + pwdPepper + "\");");
+
+        return Password.hash(input).addSalt(pwdSalt).addPepper(pwdPepper).withArgon2().getResult();
+    }
+
+    public static boolean decriptar(Connection conn, int num, String input, String text) throws SQLException {
+        String pwdSalt = querySelect(conn, "SELECT * FROM salts where id = " + num + ";").getString(2);
+        String pwdPepper = querySelect(conn, "SELECT * FROM pepers where id = " + num + ";").getString(2);
+
+        return Password.check(input, text).addSalt(pwdSalt).addPepper(pwdPepper).withArgon2();
     }
 
     public static Connection connect(String filePath) {

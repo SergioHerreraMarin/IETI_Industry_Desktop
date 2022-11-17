@@ -96,7 +96,7 @@ public class Servidor extends WebSocketServer {
                         broadcast("NV");
                     }
                 }
-            } else if (message.contains("XMLC")) {
+            } else if (message.contains("XML")) {
 
             }
         } catch (Exception e) {
