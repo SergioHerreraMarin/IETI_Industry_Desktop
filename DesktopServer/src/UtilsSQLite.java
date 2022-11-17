@@ -5,14 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class db {
-
-    public static void main(String[] args) {
-        String basePath = System.getProperty("user.dir");
-        String filePath = basePath + "/src/" + "credentials.db";
-
-        iniciarDB(filePath);
-    }
+public class UtilsSQLite {
 
     static void iniciarDB(String filePath) {
         Connection conn = connect(filePath);
