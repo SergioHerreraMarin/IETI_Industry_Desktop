@@ -144,9 +144,16 @@ public class Model {
                             return false;
                         }  
                         if (Integer.parseInt(elementSensor.getAttribute("thresholdlow")) < Integer.parseInt(elementSensor.getAttribute("thresholdhigh"))){
-                            CustomSensor customSensor = new CustomSensor(elementSensor.getAttribute("id"), elementControls.getAttribute("name"), elementSensor.getTextContent(), elementSensor.getAttribute("units"), elementSensor.getAttribute("thresholdlow"), elementSensor.getAttribute("thresholdhigh"));
+                            if (elementSensor.getAttribute("units").equals("ºC") || elementSensor.getAttribute("units").equals("ºF") || elementSensor.getAttribute("units").equals("K")){
+                                CustomSensor customSensor = new CustomSensor(elementSensor.getAttribute("id"), elementControls.getAttribute("name"), elementSensor.getTextContent(), elementSensor.getAttribute("units"), elementSensor.getAttribute("thresholdlow"), elementSensor.getAttribute("thresholdhigh"));
                         
-                            customComponents.add(customSensor);
+                                customComponents.add(customSensor);
+                            }
+                            else{
+                                JFrame jFrame = new JFrame();
+                                JOptionPane.showMessageDialog(jFrame, "Allowable temperature units are Kelvin(K), Celsius(ºC) and Fahrenheit(ºF)!!!");
+                                return false;
+                            }
                         }
                         else {
                             JFrame jFrame = new JFrame();
