@@ -85,7 +85,7 @@ public class Model {
                         Element elementSwitch = (Element)nodelistSwitch.item(j); //Current switch   
                         try {
                             Integer.parseInt(elementSwitch.getAttribute("id"));
-                            if (elementSwitch.getAttribute("default").equals("on") || elementSwitch.getAttribute("default").equals("on")){
+                            if (elementSwitch.getAttribute("default").equals("on") || elementSwitch.getAttribute("default").equals("off")){
                                 CustomSwitch customSwitch = new CustomSwitch(elementSwitch.getAttribute("id"), elementControls.getAttribute("name"), elementSwitch.getTextContent(), elementSwitch.getAttribute("default"));
                                 customComponents.add(customSwitch);
                             }
@@ -113,9 +113,16 @@ public class Model {
                                 return false;
                             }
                             else {
-                                CustomSlider customSlider = new CustomSlider(elementSlider.getAttribute("id"), elementControls.getAttribute("name"), elementSlider.getTextContent(),Float.parseFloat(elementSlider.getAttribute("default")), Float.parseFloat(elementSlider.getAttribute("min")), Float.parseFloat(elementSlider.getAttribute("max")), Float.parseFloat(elementSlider.getAttribute("step")));
+                                if (Float.parseFloat(elementSlider.getAttribute("step")) > Float.parseFloat(elementSlider.getAttribute("max")) || Float.parseFloat(elementSlider.getAttribute("step")) < Float.parseFloat(elementSlider.getAttribute("min"))){
+                                    JFrame jFrame = new JFrame();
+                                    JOptionPane.showMessageDialog(jFrame, "The step number is not correct: Slider step number!!!");
+                                    return false;
+                                }
+                                else {
+                                    CustomSlider customSlider = new CustomSlider(elementSlider.getAttribute("id"), elementControls.getAttribute("name"), elementSlider.getTextContent(),Float.parseFloat(elementSlider.getAttribute("default")), Float.parseFloat(elementSlider.getAttribute("min")), Float.parseFloat(elementSlider.getAttribute("max")), Float.parseFloat(elementSlider.getAttribute("step")));
 
-                                customComponents.add(customSlider);
+                                    customComponents.add(customSlider);
+                                }
                             }
                         } catch (NumberFormatException e) {
                             JFrame jFrame = new JFrame();
