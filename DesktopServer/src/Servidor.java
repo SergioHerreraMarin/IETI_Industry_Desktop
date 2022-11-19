@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -21,36 +20,37 @@ public class Servidor extends WebSocketServer {
     String saltPath = basePath + "/src/" + "salt.db";
     String pepperingPath = basePath + "/src/" + "peppering.db";
 
-    public static void main(String[] args) throws InterruptedException, IOException {
-        int port = 8888;
-        boolean running = true;
-
-        // Deshabilitar SSLv3 per clients Android
-        java.lang.System.setProperty("jdk.tls.client.protocols", "TLSv1,TLSv1.1,TLSv1.2");
-
-        Servidor socket = new Servidor(port);
-        socket.start();
-        System.out.println("Servidor funciona al port: " + socket.getPort());
-
-        while (running) {
-            String line = in.readLine();
-            socket.broadcast(line);
-            if (line.equals("exit")) {
-                running = false;
-            }
-        }
-
-        System.out.println("Aturant Servidor");
-        socket.stop(1000);
-    }
 
     public Servidor(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
+
+        try{
+
+            boolean running = true;
+
+            // Deshabilitar SSLv3 per clients Android
+            java.lang.System.setProperty("jdk.tls.client.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+
+            this.start();
+            System.out.println("Servidor funciona al port: " + this.getPort());
+
+            while (running) {
+                String line = in.readLine();
+                this.broadcast(line);
+                if (line.equals("exit")) {
+                    running = false;
+                }
+            }
+
+            System.out.println("Aturant Servidor");
+            this.stop(1000);
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
-    public Servidor(InetSocketAddress address) {
-        super(address);
-    }
+
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
@@ -77,9 +77,10 @@ public class Servidor extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+    
         try {
             if (message.contains("UC")) {
-
+                
                 UtilsSQLite.iniciarDB(filePath);
                 Connection connection = UtilsSQLite.connect(filePath);
 
@@ -88,21 +89,29 @@ public class Servidor extends WebSocketServer {
                 String password = userInfo[2];
 
                 ResultSet rs = UtilsSQLite.querySelect(connection, "SELECT * FROM user");
+                
 
-                while (rs.next()) {
+                broadcast("V");
+                
+
+                /*while (rs.next()) {
                     if (rs.getString("name").equals(username) && rs.getString("password").equals(password)) {
                         broadcast("V");
                     } else {
                         broadcast("NV");
                     }
-                }
-            } else if (message.contains("XML")) {
+                }*/
 
+
+            } else if (message.contains("XML")) {
+                //System.out.println("Model data servidor: " + Model.modelData);
+                broadcast(Model.modelData);
             }
+
         } catch (Exception e) {
             // TODO: handle exception
         }
-
+    
     }
 
     @Override

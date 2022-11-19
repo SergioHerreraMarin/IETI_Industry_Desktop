@@ -84,6 +84,8 @@ public class UserInterface extends JFrame {
                 model.resetData();
                 if(model.setCurrentFile(fileChooser.getSelectedFile())){
                     loadControls();
+                    Model.modelData = Model.readCurrentComponents();
+                    System.out.println("Model data: " +Model.modelData);
                 }
             break;
         }
@@ -143,81 +145,8 @@ public class UserInterface extends JFrame {
             panelExterior.add(controlPanel);   
         }
 
-        /* 
-        for(String key : model.getMapData().keySet()){
-            switch(model.returnIDType(key)){
-                
-                case "switch":
-                    JToggleButton toggleButton = new JToggleButton();
-                    if(((CustomSwitch)model.getMapData().get(key)).getDefaultValue().equals("on")){
-                        toggleButton.setSelected(true);
-                    }else{
-                        toggleButton.setSelected(false);
-                    }
-                    toggleButton.setText(((CustomSwitch)model.getMapData().get(key)).getLabel());
-
-                    for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((CustomSwitch)model.getMapData().get(key)).getBlock())){
-                            controlPanel.addToggleToPanel(toggleButton);
-                        }     
-                    }
-            
-                break;
-                case "slider":
-                    JSlider slider = new JSlider();
-                    slider.setValue((int)((CustomSlider)model.getMapData().get(key)).getDefaultValue());
-                    slider.setMaximum((int)((CustomSlider)model.getMapData().get(key)).getMax());
-                    slider.setMinimum((int)((CustomSlider)model.getMapData().get(key)).getMin());
-                    slider.setMajorTickSpacing((int)((CustomSlider)model.getMapData().get(key)).getStep());
-
-                    for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((CustomSlider)model.getMapData().get(key)).getBlock())){
-                            controlPanel.addSlidersToPanel(slider);
-                        }     
-                    }
-
-                break;
-                case "dropdown":
-                    JComboBox dropdown = new JComboBox<>();
-                    for(String option : ((CustomDropdown)model.getMapData().get(key)).getOptions()){
-                        dropdown.addItem(option);
-                    }
-                    dropdown.setSelectedIndex((int)((CustomDropdown)model.getMapData().get(key)).getDefaultValue());
-
-                    for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((CustomDropdown)model.getMapData().get(key)).getBlock())){
-                            controlPanel.addDropdownToPanel(dropdown);
-                        }     
-                    }
-                break;
-                case "sensor":
-                    JLabel unitsData = new JLabel();
-                    JLabel thresholdlow = new JLabel();
-                    JLabel thresholdhigh = new JLabel();
-                    JLabel sensorLabel = new JLabel();
-
-                    unitsData.setText("Units: " + ((CustomSensor)model.getMapData().get(key)).getUnits());
-                    thresholdlow.setText("Thresholdlow: " + ((CustomSensor)model.getMapData().get(key)).getThresholdlow());
-                    thresholdhigh.setText("Thresholdhigh: " + ((CustomSensor)model.getMapData().get(key)).getThresholdhigh());
-                    sensorLabel.setText("Label: " + ((CustomSensor)model.getMapData().get(key)).getLabel());
-
-                    for(ControlPanel controlPanel : model.getControlBlockData()){
-                        if(controlPanel.getControlId().equals(((CustomSensor)model.getMapData().get(key)).getBlock())){
-                            controlPanel.addSensorToPanel(unitsData);
-                            controlPanel.addSensorToPanel(thresholdlow);
-                            controlPanel.addSensorToPanel(thresholdhigh);
-                            controlPanel.addSensorToPanel(sensorLabel);
-                        }     
-                    }
-                break;
-            }
-        }
-
-        //Añade los paneles de control al panel exterior. 
-        for(ControlPanel controlPanel : model.getControlBlockData()){
-            panelExterior.add(controlPanel);   
-        }
-        */
+        panelExterior.repaint();
+        panelExterior.revalidate();
     }
 
     private void initInterface(){
@@ -225,5 +154,10 @@ public class UserInterface extends JFrame {
         this.setSize(WIDTH, HEIGHT);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
+
+
+    
+
+
 
 }
