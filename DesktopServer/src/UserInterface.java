@@ -87,7 +87,6 @@ public class UserInterface extends JFrame {
                 model.resetData();
                 if(model.setCurrentFile(fileChooser.getSelectedFile())){
                     loadControls();
-                    System.out.println(Model.currentComponentValuesToApp()); //Borrar
                 }
             break;
         }
@@ -108,13 +107,10 @@ public class UserInterface extends JFrame {
                 }
 
                 slider.addChangeListener(new ChangeListener() { //----------------------------------------------Para actualizar componentes..
-
                     @Override
                     public void stateChanged(ChangeEvent e) {
-                        System.out.println("MOVIDO");
-                        
+                        ((CustomSlider)component).setDefaultValue(slider.getValue());         
                     }
-                    
                 });
 
             }else if(component instanceof CustomSwitch){
@@ -126,6 +122,21 @@ public class UserInterface extends JFrame {
                     }     
                 }
 
+                tggleButtonn.addChangeListener(new ChangeListener() {
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+
+                        String toggleValue;
+                        if(tggleButtonn.isSelected()){
+                            toggleValue = "on";
+                        }else{
+                            toggleValue = "off";
+                        } 
+
+                        ((CustomSwitch)component).setDefaultValue(toggleValue);    
+                    }        
+                });
+
             }else if(component instanceof CustomDropdown){
 
                 JComboBox dropdown = ((CustomDropdown)component).createCustomDropdown();
@@ -134,6 +145,14 @@ public class UserInterface extends JFrame {
                         controlPanel.addDropdownToPanel(dropdown);
                     }     
                 }
+
+                dropdown.addActionListener(new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ((CustomDropdown)component).setDefaultValue(dropdown.getSelectedIndex());
+                    } 
+                });
+
 
             }else if(component instanceof CustomSensor){
 
