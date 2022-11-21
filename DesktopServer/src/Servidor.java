@@ -80,7 +80,6 @@ public class Servidor extends WebSocketServer {
 
                 UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
                 Connection connection = UtilsSQLite.connect(filePath);
-                ;
 
                 String[] userInfo = message.split("#");
                 String username = userInfo[1];
