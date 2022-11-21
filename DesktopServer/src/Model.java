@@ -20,9 +20,8 @@ import org.xml.sax.SAXException;
 public class Model {
 
     private File currentFile;
-    private static ArrayList<CustomControlPanel> controlBlockData = new ArrayList<CustomControlPanel>();
+    private static ArrayList<CustomControlPanel> customControls = new ArrayList<CustomControlPanel>();
     private static ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
-    public static String modelData;
 
     public Model(){
 
@@ -47,7 +46,7 @@ public class Model {
 
 
     public ArrayList<CustomControlPanel> getControlBlockData(){
-        return this.controlBlockData;
+        return this.customControls;
     }
 
     
@@ -71,7 +70,7 @@ public class Model {
                     Border border = BorderFactory.createTitledBorder(elementControls.getAttribute("name"));
                     CustomControlPanel controlPanel = new CustomControlPanel(elementControls.getAttribute("name"));
                     controlPanel.setBorder(border);
-                    controlBlockData.add(controlPanel);
+                    customControls.add(controlPanel);
                                 
                     //Bucle de switches
                     NodeList nodelistSwitch = elementControls.getElementsByTagName("switch");   
@@ -147,12 +146,39 @@ public class Model {
     }
 
 
-    public static String readCurrentComponents(){
+    public static String currentComponentValuesToApp(){
+        String currentControlId = "";
         String data = "";
-        for(JComponent component : customComponents){
-            data += component;
+
+        for(CustomControlPanel control : customControls){
+            currentControlId = control.getControlId(); //block1
+            
+            for(JComponent component : customComponents){
+                if(component instanceof CustomSlider){
+                    if(((CustomSlider)component).getBlock().equals(currentControlId)){
+                        data += component.toString();
+                    }
+                
+                }else if(component instanceof CustomSwitch){
+                    if(((CustomSwitch)component).getBlock().equals(currentControlId)){
+                        data += component.toString();
+                    }
+                
+                }else if(component instanceof CustomDropdown){
+                    if(((CustomDropdown)component).getBlock().equals(currentControlId)){
+                        data += component.toString();
+                    }
+
+                }else if(component instanceof CustomSensor){
+                    if(((CustomSensor)component).getBlock().equals(currentControlId)){
+                        data += component.toString();
+                    }
+
+                }
+            }
+            data += ";";
         }
-        System.out.println(data); 
+
         return data;
     }
 
@@ -160,7 +186,7 @@ public class Model {
 
     public void resetData(){
         customComponents.clear();
-        controlBlockData.clear();
+        customControls.clear();
     }
     
 }

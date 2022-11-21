@@ -20,7 +20,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
 public class UserInterface extends JFrame {
 
@@ -84,8 +87,7 @@ public class UserInterface extends JFrame {
                 model.resetData();
                 if(model.setCurrentFile(fileChooser.getSelectedFile())){
                     loadControls();
-                    Model.modelData = Model.readCurrentComponents();
-                    System.out.println("Model data: " +Model.modelData);
+                    System.out.println(Model.currentComponentValuesToApp()); //Borrar
                 }
             break;
         }
@@ -104,6 +106,16 @@ public class UserInterface extends JFrame {
                         controlPanel.addSlidersToPanel(slider);
                     }     
                 }
+
+                slider.addChangeListener(new ChangeListener() { //----------------------------------------------Para actualizar componentes..
+
+                    @Override
+                    public void stateChanged(ChangeEvent e) {
+                        System.out.println("MOVIDO");
+                        
+                    }
+                    
+                });
 
             }else if(component instanceof CustomSwitch){
 

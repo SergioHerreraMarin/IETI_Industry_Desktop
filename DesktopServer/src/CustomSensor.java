@@ -82,8 +82,8 @@ public class CustomSensor extends JLabel {
 
     @Override
     public String toString() {
-        return "CustomSensor [id=" + id + ", block=" + block + ", label=" + label + ", units=" + units
-                + ", thresholdlow=" + thresholdlow + ", thresholdhigh=" + thresholdhigh + "]";
+        return "%CustomSensor:id=" + id + ", block=" + block + ", label=" + label + ", units=" + units
+                + ", thresholdlow=" + thresholdlow + ", thresholdhigh=" + thresholdhigh;
     }
 
 }

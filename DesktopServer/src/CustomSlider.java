@@ -9,7 +9,8 @@ public class CustomSlider extends JSlider {
     private float min;
     private float max;
     private float step;
-    
+
+
     public CustomSlider(String id, String block, String label, float defaultValue, float min, float max, float step) {
         this.id = id;
         this.block = block;
@@ -18,7 +19,11 @@ public class CustomSlider extends JSlider {
         this.min = min;
         this.max = max;
         this.step = step;
+
     }
+
+    
+    
 
     public String getId() {
         return id;
@@ -91,8 +96,8 @@ public class CustomSlider extends JSlider {
 
     @Override
     public String toString() {
-        return "CustomSlider [id=" + id + ", block=" + block + ", label=" + label + ", defaultValue=" + defaultValue
-                + ", min=" + min + ", max=" + max + ", step=" + step + "]";
+        return "%CustomSlider:id=" + id + ", block=" + block + ", label=" + label + ", defaultValue=" + defaultValue
+                + ", min=" + min + ", max=" + max + ", step=" + step;
     }
 
 }

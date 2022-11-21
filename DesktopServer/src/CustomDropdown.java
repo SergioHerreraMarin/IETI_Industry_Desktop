@@ -9,7 +9,7 @@ public class CustomDropdown extends JComboBox {
     private String label;
     private int defaultValue;
     private ArrayList<String> options = new ArrayList<String>();
-   
+ 
     public CustomDropdown(String id, String block, String label, int defaultValue, ArrayList<String> options) {
         
         this.id = id;
@@ -72,10 +72,26 @@ public class CustomDropdown extends JComboBox {
         return dropdown;
     }
 
+
+    private String readDropdownOptions(){
+        String opt = "";
+        
+        for(int i = 0; i < options.size(); i++){
+            if(i < options.size() - 1){
+                opt += options.get(i) + "!";
+            }else{
+                opt += options.get(i);
+            }
+        }
+        
+        return opt;
+    }
+
+
     @Override
     public String toString() {
-        return "CustomDropdown [id=" + id + ", block=" + block + ", label=" + label + ", defaultValue=" + defaultValue
-                + ", options=" + options + "]";
+        return "%CustomDropdown:id=" + id + ", block=" + block + ", label=" + label + ", defaultValue=" + defaultValue
+                + ", options=" + readDropdownOptions();
     }
 
 }

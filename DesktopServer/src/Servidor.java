@@ -51,7 +51,6 @@ public class Servidor extends WebSocketServer {
     }
 
 
-
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
@@ -89,23 +88,18 @@ public class Servidor extends WebSocketServer {
                 String password = userInfo[2];
 
                 ResultSet rs = UtilsSQLite.querySelect(connection, "SELECT * FROM user");
-                
-
-                broadcast("V");
-                
-
-                /*while (rs.next()) {
+            
+                while (rs.next()) {
                     if (rs.getString("name").equals(username) && rs.getString("password").equals(password)) {
                         broadcast("V");
                     } else {
                         broadcast("NV");
                     }
-                }*/
+                }
 
+            } else if(message.equals("XML")) {
 
-            } else if (message.contains("XML")) {
-                //System.out.println("Model data servidor: " + Model.modelData);
-                broadcast(Model.modelData);
+                broadcast(Model.currentComponentValuesToApp());
             }
 
         } catch (Exception e) {

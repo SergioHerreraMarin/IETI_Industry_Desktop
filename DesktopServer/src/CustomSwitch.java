@@ -64,8 +64,7 @@ public class CustomSwitch extends JToggleButton {
 
     @Override
     public String toString() {
-        return "CustomSwitch [id=" + id + ", block=" + block + ", label=" + label + ", defaultValue=" + defaultValue
-                + "]";
+        return "%CustomSwitch:id=" + id + ", block=" + block + ", label=" + label + ", defaultValue=" + defaultValue;
     }
 
 
