@@ -1,17 +1,21 @@
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Random;
+
 import com.password4j.Password;
 
 public class UtilsSQLite {
 
-    static void iniciarDB(String filePath) {
+    static String basePath = System.getProperty("user.dir");
+
+    static void iniciarDB(String filePath, String saltPath, String pepperPath) {
         Connection conn = connect(filePath);
+        Connection connSalt = connect(saltPath);
+        Connection connPepper = connect(pepperPath);
 
         queryUpdate(conn, "DROP TABLE IF EXISTS user;");
         queryUpdate(conn, "CREATE TABLE IF NOT EXISTS user ("
@@ -19,14 +23,17 @@ public class UtilsSQLite {
                 + "	name varchar(15) NOT NULL,"
                 + "	password varchar(50) NOT NULL );");
 
+        queryUpdate(connSalt, "DROP TABLE IF EXISTS salts;");
+        queryUpdate(connSalt, "CREATE TABLE IF NOT EXISTS salts (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, salt text NOT NULL);");
+
+        queryUpdate(connPepper, "DROP TABLE IF EXISTS peppers;");
+        queryUpdate(connPepper, "CREATE TABLE IF NOT EXISTS peppers (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, pepper text NOT NULL);");
+
         queryUpdate(conn,
-                "INSERT INTO user (name, password) VALUES (\"admin\",  \"hola123\");");
-
-        queryUpdate(conn, "CREATE TABLE IF NOT EXISTS salts (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, salt varchar(500));");
-
-        queryUpdate(conn, "CREATE TABLE IF NOT EXISTS peppers (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, pepper varchar(500));");
+                "INSERT INTO user (name, password) VALUES (\"admin\",  \"" + encriptar("hola123")
+                        + "\");");
     }
 
     public static int randomInt(int min, int max) {
@@ -46,21 +53,61 @@ public class UtilsSQLite {
         return cadena;
     }
 
-    public static String encriptar(Connection conn, String input) {
+    public static String encriptar(String input) {
+        String saltPath = basePath + "/src/" + "salt.db";
+        Connection cSalt = connect(saltPath);
+
+        String pepperingPath = basePath + "/src/" + "peppering.db";
+        Connection cPepper = connect(pepperingPath);
+
         String pwdSalt = randomChars();
         String pwdPepper = randomChars();
 
-        queryUpdate(conn, "INSERT INTO salts (salt) VALUES (\"" + pwdSalt + "\");");
-        queryUpdate(conn, "INSERT INTO peppers (pepper) VALUES (\"" + pwdPepper + "\");");
+        UtilsSQLite.queryUpdate(cSalt, "INSERT INTO salts (salt) VALUES (\"" + pwdSalt + "\");");
+        UtilsSQLite.queryUpdate(cPepper,
+                "INSERT INTO peppers (pepper) VALUES (\"" + pwdPepper + "\");");
+
+        disconnect(cSalt);
+        disconnect(cPepper);
 
         return Password.hash(input).addSalt(pwdSalt).addPepper(pwdPepper).withArgon2().getResult();
     }
 
-    public static boolean decriptar(Connection conn, int num, String input, String text) throws SQLException {
-        String pwdSalt = querySelect(conn, "SELECT * FROM salts where id = " + num + ";").getString(2);
-        String pwdPepper = querySelect(conn, "SELECT * FROM pepers where id = " + num + ";").getString(2);
+    public static boolean decriptar(int id, String input, String hash)
+            throws SQLException {
+        String saltPath = basePath + "/src/" + "salt.db";
+        Connection cSalt = connect(saltPath);
 
-        return Password.check(input, text).addSalt(pwdSalt).addPepper(pwdPepper).withArgon2();
+        String pepperingPath = basePath + "/src/" + "peppering.db";
+        Connection cPepper = connect(pepperingPath);
+
+        String pwdSalt = UtilsSQLite.querySelect(cSalt, "SELECT * FROM salts where id = " + id + ";").getString(2);
+        String pwdPepper = UtilsSQLite.querySelect(cPepper, "SELECT * FROM peppers where id = " + id + ";")
+                .getString(2);
+
+        disconnect(cSalt);
+        disconnect(cPepper);
+
+        return Password.check(input, hash).addSalt(pwdSalt).addPepper(pwdPepper).withArgon2();
+    }
+
+    public static boolean login(Connection conn, Connection cSalt, Connection cPepper, String username, String password)
+            throws SQLException {
+
+        ResultSet rs = UtilsSQLite.querySelect(conn, "SELECT id, password from user where name='" + username + "';");
+        String hash = "";
+        int idUser = 0;
+
+        while (rs.next()) {
+            idUser = rs.getInt("id");
+            hash = rs.getString("password");
+        }
+
+        if (decriptar(idUser, password, hash)) {
+            return true;
+        }
+        return false;
+
     }
 
     public static Connection connect(String filePath) {
@@ -69,10 +116,6 @@ public class UtilsSQLite {
         try {
             String url = "jdbc:sqlite:" + filePath;
             conn = DriverManager.getConnection(url);
-            if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
-                System.out.println("BBDD driver: " + meta.getDriverName());
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -98,7 +141,6 @@ public class UtilsSQLite {
         try {
             if (conn != null) {
                 conn.close();
-                System.out.println("DDBB SQLite desconnectada");
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());

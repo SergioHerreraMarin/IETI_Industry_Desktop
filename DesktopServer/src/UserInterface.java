@@ -31,17 +31,17 @@ public class UserInterface extends JFrame {
     private final int HEIGHT = 600;
     private Model model;
 
-    JPanel controlsPanel,panelSliderComponent, panelTogglesComponent, panelComboComponent, panelExterior;
+    JPanel controlsPanel, panelSliderComponent, panelTogglesComponent, panelComboComponent, panelExterior;
 
-    public UserInterface(){
+    public UserInterface() {
         super("DESKTOP SERVER");
-        
+
         model = new Model();
         initInterface();
         createMenuBar();
-        
-        Border emptyBorder = BorderFactory.createEmptyBorder(20,20,20,20);
-        panelExterior = new JPanel(new GridLayout(0,1));
+
+        Border emptyBorder = BorderFactory.createEmptyBorder(20, 20, 20, 20);
+        panelExterior = new JPanel(new GridLayout(0, 1));
         panelExterior.setBorder(emptyBorder);
         panelExterior.setPreferredSize(new Dimension(1000, 600));
         JScrollPane scrollPanel = new JScrollPane(panelExterior);
@@ -50,19 +50,18 @@ public class UserInterface extends JFrame {
         this.setVisible(true);
     }
 
-
-    private void createMenuBar(){
+    private void createMenuBar() {
 
         JMenuBar menuBar = new JMenuBar();
         JMenu menuArxiu = new JMenu("Arxiu");
         JMenu menuVisualitzacion = new JMenu("Visualitzacions");
         JMenuItem itemLoadConfig = new JMenuItem("Carregar configuració");
 
-        itemLoadConfig.addActionListener(new ActionListener(){
+        itemLoadConfig.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openFile();
-            }   
+            }
         });
         menuArxiu.add(itemLoadConfig);
 
@@ -72,8 +71,7 @@ public class UserInterface extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
-
-    private void openFile(){
+    private void openFile() {
 
         int chooserStatus;
 
@@ -82,94 +80,88 @@ public class UserInterface extends JFrame {
         fileChooser.setFileFilter(extensionFilter);
         chooserStatus = fileChooser.showOpenDialog(this);
 
-        switch(chooserStatus){
+        switch (chooserStatus) {
             case JFileChooser.APPROVE_OPTION:
                 model.resetData();
-                if(model.setCurrentFile(fileChooser.getSelectedFile())){
+                if (model.setCurrentFile(fileChooser.getSelectedFile())) {
                     loadControls();
-                    System.out.println(Model.currentComponentValuesToApp()); //Borrar
                 }
-            break;
+                break;
         }
     }
-    
-    
-    private void loadControls(){
 
-        for(JComponent component : model.getCustomComponents()){
+    private void loadControls() {
 
-            if(component instanceof CustomSlider){
+        for (JComponent component : model.getCustomComponents()) {
 
-                JSlider slider = ((CustomSlider)component).createCustomSlider();           
-                for(CustomControlPanel controlPanel : model.getControlBlockData()){
-                    if(controlPanel.getControlId().equals(((CustomSlider) component).getBlock())){
+            if (component instanceof CustomSlider) {
+
+                JSlider slider = ((CustomSlider) component).createCustomSlider();
+                for (CustomControlPanel controlPanel : model.getControlBlockData()) {
+                    if (controlPanel.getControlId().equals(((CustomSlider) component).getBlock())) {
                         controlPanel.addSlidersToPanel(slider);
-                    }     
+                    }
                 }
 
-                slider.addChangeListener(new ChangeListener() { //----------------------------------------------Para actualizar componentes..
+                slider.addChangeListener(new ChangeListener() { // ----------------------------------------------Para
+                                                                // actualizar componentes..
 
                     @Override
                     public void stateChanged(ChangeEvent e) {
                         System.out.println("MOVIDO");
-                        
+
                     }
-                    
+
                 });
 
-            }else if(component instanceof CustomSwitch){
+            } else if (component instanceof CustomSwitch) {
 
-                JToggleButton tggleButtonn = ((CustomSwitch)component).createCustomSwitch();
-                for(CustomControlPanel controlPanel : model.getControlBlockData()){
-                    if(controlPanel.getControlId().equals(((CustomSwitch) component).getBlock())){
+                JToggleButton tggleButtonn = ((CustomSwitch) component).createCustomSwitch();
+                for (CustomControlPanel controlPanel : model.getControlBlockData()) {
+                    if (controlPanel.getControlId().equals(((CustomSwitch) component).getBlock())) {
                         controlPanel.addToggleToPanel(tggleButtonn);
-                    }     
+                    }
                 }
 
-            }else if(component instanceof CustomDropdown){
+            } else if (component instanceof CustomDropdown) {
 
-                JComboBox dropdown = ((CustomDropdown)component).createCustomDropdown();
-                for(CustomControlPanel controlPanel : model.getControlBlockData()){
-                    if(controlPanel.getControlId().equals(((CustomDropdown) component).getBlock())){
+                JComboBox dropdown = ((CustomDropdown) component).createCustomDropdown();
+                for (CustomControlPanel controlPanel : model.getControlBlockData()) {
+                    if (controlPanel.getControlId().equals(((CustomDropdown) component).getBlock())) {
                         controlPanel.addDropdownToPanel(dropdown);
-                    }     
+                    }
                 }
 
-            }else if(component instanceof CustomSensor){
+            } else if (component instanceof CustomSensor) {
 
-                ArrayList<JLabel> sensorData = ((CustomSensor)component).createCustomSensor();
+                ArrayList<JLabel> sensorData = ((CustomSensor) component).createCustomSensor();
 
-                for(CustomControlPanel controlPanel : model.getControlBlockData()){
-                    if(controlPanel.getControlId().equals(((CustomSensor) component).getBlock())){ 
-                        for(JLabel data : sensorData){
+                for (CustomControlPanel controlPanel : model.getControlBlockData()) {
+                    if (controlPanel.getControlId().equals(((CustomSensor) component).getBlock())) {
+                        for (JLabel data : sensorData) {
                             controlPanel.addSensorToPanel(data);
                         }
-                    }     
+                    }
                 }
 
-            }else{
+            } else {
                 System.out.println("Clase no encontrada");
             }
         }
 
-        //Añade los paneles de control al panel exterior. 
-        for(CustomControlPanel controlPanel : model.getControlBlockData()){
-            panelExterior.add(controlPanel);   
+        // Añade los paneles de control al panel exterior.
+        for (CustomControlPanel controlPanel : model.getControlBlockData()) {
+            panelExterior.add(controlPanel);
         }
 
         panelExterior.repaint();
         panelExterior.revalidate();
     }
 
-    private void initInterface(){
-        
+    private void initInterface() {
+
         this.setSize(WIDTH, HEIGHT);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
-
-
-    
-
-
 
 }

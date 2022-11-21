@@ -20,11 +20,10 @@ public class Servidor extends WebSocketServer {
     String saltPath = basePath + "/src/" + "salt.db";
     String pepperingPath = basePath + "/src/" + "peppering.db";
 
-
     public Servidor(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
 
-        try{
+        try {
 
             boolean running = true;
 
@@ -32,7 +31,7 @@ public class Servidor extends WebSocketServer {
             java.lang.System.setProperty("jdk.tls.client.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 
             this.start();
-            System.out.println("Servidor funciona al port: " + this.getPort());
+            System.out.println("Server running in port: " + this.getPort());
 
             while (running) {
                 String line = in.readLine();
@@ -42,70 +41,71 @@ public class Servidor extends WebSocketServer {
                 }
             }
 
-            System.out.println("Aturant Servidor");
+            System.out.println("Stopping Server...");
             this.stop(1000);
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
         // Saludem personalment al nou client
-        conn.send("Benvingut a IETI Industry");
+        conn.send("Welcome to IETI Industry");
 
-        broadcast("Nova connexió: " + handshake.getResourceDescriptor());
+        broadcast("New connection: " + handshake.getResourceDescriptor());
 
         // Mostrem per pantalla (servidor) la nova connexió
         String host = conn.getRemoteSocketAddress().getAddress().getHostAddress();
-        System.out.println(host + " s'ha connectat");
+        System.out.println(host + " has connected");
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
 
         // Informem a tothom que el client s'ha desconnectat
-        broadcast(conn + " s'ha desconnectat");
+        broadcast(conn + " has disconnected");
 
         // Mostrem per pantalla (servidor) la desconnexió
-        System.out.println(conn + " s'ha desconnectat");
+        System.out.println(conn + " has disconnected");
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-    
+
         try {
             if (message.contains("UC")) {
-                
-                UtilsSQLite.iniciarDB(filePath);
+
+                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
                 Connection connection = UtilsSQLite.connect(filePath);
+                ;
 
                 String[] userInfo = message.split("#");
                 String username = userInfo[1];
                 String password = userInfo[2];
 
-                ResultSet rs = UtilsSQLite.querySelect(connection, "SELECT * FROM user");
-            
+                ResultSet rs = UtilsSQLite.querySelect(connection, "SELECT * FROM user;");
+
                 while (rs.next()) {
-                    if (rs.getString("name").equals(username) && rs.getString("password").equals(password)) {
+                    if (UtilsSQLite.login(connection, UtilsSQLite.connect(saltPath),
+                            UtilsSQLite.connect(pepperingPath), username, password)) {
                         broadcast("V");
                     } else {
                         broadcast("NV");
                     }
                 }
 
-            } else if(message.equals("XML")) {
-
+            } else if (message.equals("XML")) {
+                System.out.println("Components sent");
                 broadcast(Model.currentComponentValuesToApp());
             }
 
         } catch (Exception e) {
             // TODO: handle exception
         }
-    
+
     }
 
     @Override
@@ -117,9 +117,14 @@ public class Servidor extends WebSocketServer {
     @Override
     public void onStart() {
         // S'inicia el servidor
-        System.out.println("Escriu 'exit' per aturar el servidor");
+        System.out.println("Welcome to IETI Industry");
+        System.out.println("Write 'exit' to stop the server");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
+        UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
+        UtilsSQLite.connect(filePath);
+        UtilsSQLite.connect(saltPath);
+        UtilsSQLite.connect(pepperingPath);
     }
 
     public String getConnectionId(WebSocket connection) {
