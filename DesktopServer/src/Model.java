@@ -109,7 +109,7 @@ public class Model {
 
                         try {
                             Integer.parseInt(elementSlider.getAttribute("id"));
-                            if (Integer.parseInt(elementSlider.getAttribute("default")) > Float.parseFloat(elementSlider.getAttribute("max")) || Integer.parseInt(elementSlider.getAttribute("default")) < Float.parseFloat(elementSlider.getAttribute("min"))){
+                            if (Float.parseFloat(elementSlider.getAttribute("default")) > Float.parseFloat(elementSlider.getAttribute("max")) || Float.parseFloat(elementSlider.getAttribute("default")) < Float.parseFloat(elementSlider.getAttribute("min"))){
                                 JFrame jFrame = new JFrame();
                                 JOptionPane.showMessageDialog(jFrame, "The default number is not correct: Slider default number!!!");
                                 return false;
