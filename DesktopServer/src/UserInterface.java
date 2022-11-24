@@ -23,7 +23,6 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.synth.SynthSeparatorUI;
 
 public class UserInterface extends JFrame {
 
