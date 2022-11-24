@@ -20,9 +20,9 @@ import org.xml.sax.SAXException;
 public class Model {
 
     private File currentFile;
+    private ArrayList<CustomControlPanel> controlBlockData = new ArrayList<CustomControlPanel>();
+    private ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
 
-    private static ArrayList<CustomControlPanel> customControls = new ArrayList<CustomControlPanel>();
-    private static ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
 
     public Model(){
 
@@ -52,7 +52,7 @@ public class Model {
 
     
     public boolean readXML() throws IllegalArgumentException{
-    
+
         if(currentFile != null){
             
             try {
@@ -67,7 +67,6 @@ public class Model {
                 for(int i = 0; i < nodelistControls.getLength(); i++){
 
                     Element elementControls = (Element) nodelistControls.item(i);
-
                     if (elementControls.getAttribute("name").isEmpty()){
                         JFrame jFrame = new JFrame();
                         JOptionPane.showMessageDialog(jFrame, "The name tag is not configured correctly!!!");
@@ -106,10 +105,9 @@ public class Model {
                     NodeList nodelistSlider = elementControls.getElementsByTagName("slider");     
                     for(int k = 0; k < nodelistSlider.getLength(); k++){
                         Element elementSlider = (Element)nodelistSlider.item(k); //Current switch    
-
                         try {
                             Integer.parseInt(elementSlider.getAttribute("id"));
-                            if (Float.parseFloat(elementSlider.getAttribute("default")) > Float.parseFloat(elementSlider.getAttribute("max")) || Float.parseFloat(elementSlider.getAttribute("default")) < Float.parseFloat(elementSlider.getAttribute("min"))){
+                            if (Integer.parseInt(elementSlider.getAttribute("default")) > Float.parseFloat(elementSlider.getAttribute("max")) || Integer.parseInt(elementSlider.getAttribute("default")) < Float.parseFloat(elementSlider.getAttribute("min"))){
                                 JFrame jFrame = new JFrame();
                                 JOptionPane.showMessageDialog(jFrame, "The default number is not correct: Slider default number!!!");
                                 return false;
@@ -131,12 +129,12 @@ public class Model {
                             JOptionPane.showMessageDialog(jFrame, "The ID must be a number: Slider ID!!!\n"+e.getMessage());
                             return false;
                         }
+                        
                     }
                     
                     //Bucle sensor
                     NodeList nodelistSensor = elementControls.getElementsByTagName("sensor");
                     for(int l = 0; l < nodelistSensor.getLength(); l++){
-
                         Element elementSensor = (Element)nodelistSensor.item(l); //Current switch
                         try {
                             Integer.parseInt(elementSensor.getAttribute("id"));
@@ -162,6 +160,7 @@ public class Model {
                             JOptionPane.showMessageDialog(jFrame, "Thresholdlow is bigger than thresholdhigh!!!");
                             return false;
                         }
+                        
                     
                     }
                     
@@ -217,7 +216,8 @@ public class Model {
             	JFrame jFrame = new JFrame();
                 JOptionPane.showMessageDialog(jFrame, "Aware of! Don't put letters and special characters where they don't belong, also be careful with the titles of the variables.\n"+e.getMessage());
                 return false;
-            }    
+            } 
+         
         }
         else{
         	JFrame jFrame = new JFrame();
@@ -226,9 +226,121 @@ public class Model {
         }
         return true;
     }
-    
+
+/* 
+    private void readCurrentData(){
+
+        for(String key : mapData.keySet()){
+
+            switch(returnIDType(key)){
+                case "switch":
+                	try {
+                		Integer.parseInt(((CustomSwitch)mapData.get(key)).getId());
+                		
+					} catch (NumberFormatException e) {
+						// TODO: handle exception
+						JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "The ID must be a number!!!\n"+e.getMessage());
+                        break;
+					}
+                	try {
+                		String control = ((CustomSwitch)mapData.get(key)).getDefaultValue();
+						if(control.equals("off") || control.equals("on")) {
+							System.out.println("\nSwitch - ID: " + ((CustomSwitch)mapData.get(key)).getId() + ", Default: " + ((CustomSwitch)mapData.get(key)).getDefaultValue() + ", Label: " + ((CustomSwitch)mapData.get(key)).getLabel() + ", Block: " + ((CustomSwitch)mapData.get(key)).getBlock());
+						}
+						else {
+							throw new Exception();
+						}
+					} catch (Exception e) {
+						JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "The default value inside the switch must be on or off");
+                        break;
+					}
+                    break;
+                case "slider":
+                	try {
+                		Integer.parseInt(((CustomSlider)mapData.get(key)).getId());
+					} catch (NumberFormatException e) {
+						// TODO: handle exception
+						JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "Watch the variables, you have to put numbers!!!\n"+e.getMessage());
+                        break;
+					}
+                	if (((CustomSlider)mapData.get(key)).getDefaultValue()<((CustomSlider)mapData.get(key)).getMin() || ((CustomSlider)mapData.get(key)).getDefaultValue() > ((CustomSlider)mapData.get(key)).getMax()) {
+                		JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "The default number of the slider is not within the established parameters");
+                	}	
+                	else{
+                		System.out.println("\nSlider - ID: " + ((CustomSlider)mapData.get(key)).getId() + ", Default: " + ((CustomSlider)mapData.get(key)).getDefaultValue() + ", Min: " + ((CustomSlider)mapData.get(key)).getMin() + ", Max: " + ((CustomSlider)mapData.get(key)).getMax() + ", Step: " + ((CustomSlider)mapData.get(key)).getStep() + ", Label: " + ((CustomSlider)mapData.get(key)).getLabel() + ", Block: " + ((CustomSlider)mapData.get(key)).getBlock());
+
+                	}
+                    break;
+                case "dropdown":
+                    try {
+                        Integer.parseInt(((CustomDropdown)mapData.get(key)).getId());
+                    } catch (NumberFormatException e) {
+                        // TODO: handle exception
+                        JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "The ID must be a number!!!\n"+e.getMessage());
+                        break;
+                    }
+                    System.out.println("\nDropdown - ID: " + ((CustomDropdown)mapData.get(key)).getId() + ", Default: " + ((CustomDropdown)mapData.get(key)).getDefaultValue() + ", Block: " + ((CustomDropdown)mapData.get(key)).getBlock() + ", Options:");
+                    for(String option : ((CustomDropdown)mapData.get(key)).getOptions()){
+                        System.out.println(option);
+                    }
+                break;
+                case "sensor":
+                	try {
+                		Integer.parseInt(((CustomSensor)mapData.get(key)).getId());
+					} catch (NumberFormatException e) {
+						// TODO: handle exception
+						JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "The ID must be a number!!!\n"+e.getMessage());
+                        break;
+					}
+                	try {
+						String control = ((CustomSensor)mapData.get(key)).getUnits();
+						if (control.equals("ºC")) {
+							System.out.println("\nSensor - ID: " + ((CustomSensor)mapData.get(key)).getId() + ", Units: " + ((CustomSensor)mapData.get(key)).getUnits() + ", Thresholdlow: " + ((CustomSensor)mapData.get(key)).getThresholdlow() + ", Thresholdhigh: " + ((CustomSensor)mapData.get(key)).getThresholdhigh() + ", Label: " + ((CustomSensor)mapData.get(key)).getLabel() + ", Block: " + ((CustomSensor)mapData.get(key)).getBlock());
+						}
+						else {
+							throw new Exception();
+						}
+					} catch (Exception e) {
+						// TODO: handle exception
+						JFrame jFrame = new JFrame();
+                        JOptionPane.showMessageDialog(jFrame, "The temperature measurement unit is incorrect!");
+                        break;
+					}
+                    break;
+                default:
+                	JFrame jFrame = new JFrame();
+                    JOptionPane.showMessageDialog(jFrame, "Key not found!");
+                break;
+            }
+
+        }
+
+    }
+    */
+
     public void resetData(){
         customComponents.clear();
         controlBlockData.clear();
     }
+
+    /**Función que devuelve el tipo de componente a través de la ID*/
+    /*public String returnIDType(String id){
+        String type = "-1";
+        String[] stringArray  = id.split("-");
+        if(stringArray.length != 2){
+        	JFrame jFrame = new JFrame();
+            JOptionPane.showMessageDialog(jFrame, "The format of the key is wrong!");
+        }else{
+            type = stringArray[0]; //Se queda con el tipo
+        }
+        return type;
+    }*/
+
+    
 }
