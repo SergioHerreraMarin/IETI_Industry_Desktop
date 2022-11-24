@@ -1,12 +1,17 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -15,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -25,12 +31,18 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class UserInterface extends JFrame {
+    static String basePath = System.getProperty("user.dir");
+    String filePath = basePath + "/src/snapshot.db";
 
     private final int WIDTH = 1300;
     private final int HEIGHT = 600;
     private Model model;
 
-    JPanel controlsPanel, panelSliderComponent, panelTogglesComponent, panelComboComponent, panelExterior;
+    JPanel controlsPanel, panelSliderComponent, panelTogglesComponent, panelComboComponent, panelSnapshot,
+            panelExterior;
+
+    JButton snapshot = new JButton("Snapshot");
+    JButton loadSnapshot = new JButton("Load Snapshot");
 
     public UserInterface() {
         super("DESKTOP SERVER");
@@ -38,9 +50,9 @@ public class UserInterface extends JFrame {
         model = new Model();
         initInterface();
         createMenuBar();
-
         Border emptyBorder = BorderFactory.createEmptyBorder(20, 20, 20, 20);
         panelExterior = new JPanel(new GridLayout(0, 1));
+        panelSnapshot = new JPanel(new FlowLayout());
         panelExterior.setBorder(emptyBorder);
         panelExterior.setPreferredSize(new Dimension(1000, 600));
         JScrollPane scrollPanel = new JScrollPane(panelExterior);
@@ -172,6 +184,19 @@ public class UserInterface extends JFrame {
             panelExterior.add(controlPanel);
         }
 
+        // SNAPSHOTS
+        panelSnapshot.add(snapshot);
+        panelSnapshot.add(loadSnapshot);
+
+        snapshot.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                guardarInstancia();
+            }
+        });
+
+        panelExterior.add(panelSnapshot);
+
         panelExterior.repaint();
         panelExterior.revalidate();
     }
@@ -180,6 +205,38 @@ public class UserInterface extends JFrame {
 
         this.setSize(WIDTH, HEIGHT);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+
+    private void guardarInstancia() {
+        String userSnapshot = "";
+
+        // Se conecta a esa base de datos
+        Connection conn = UtilsSQLite.connect(filePath);
+
+        String data = Model.currentComponentValuesToApp();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        String dataInstancia = LocalDateTime.now().toString().replace("T", " ");
+
+        while (userSnapshot.equals("") || userSnapshot.length() < 3) {
+            userSnapshot = JOptionPane.showInputDialog("Insert a name:");
+        }
+
+        UtilsSQLite.queryUpdate(conn,
+                "INSERT INTO snapshot (state, date, user) VALUES (\"" + Model.currentComponentValuesToApp()
+                        + "\",  \"" + dataInstancia + "\", \"" + userSnapshot + "\");");
+
+        JOptionPane.showMessageDialog(null, "Snapshot done", "Snapshot", JOptionPane.INFORMATION_MESSAGE);
+
+        UtilsSQLite.disconnect(conn);
+    }
+
+    private void cargarInstancia() {
+        // Crea la base de datos de snapshot
+        // UtilsSQLite.snapshot(filePath);
+
+        // Se conecta a esa base de datos
+        Connection conn = UtilsSQLite.connect(filePath);
+
     }
 
 }

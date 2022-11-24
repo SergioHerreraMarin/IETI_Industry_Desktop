@@ -16,9 +16,10 @@ public class Servidor extends WebSocketServer {
     String basePath = System.getProperty("user.dir");
 
     // Paths de los archivos
-    String filePath = basePath + "/src/" + "database.db";
-    String saltPath = basePath + "/src/" + "salt.db";
-    String pepperingPath = basePath + "/src/" + "peppering.db";
+    String filePath = basePath + "/src/database.db";
+    String saltPath = basePath + "/src/salt.db";
+    String pepperingPath = basePath + "/src/peppering.db";
+    String snapshotPath = basePath + "/src/snapshot.db";
 
     public Servidor(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
@@ -78,7 +79,7 @@ public class Servidor extends WebSocketServer {
         try {
             if (message.contains("UC")) {
 
-                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
+                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath, snapshotPath);
                 Connection connection = UtilsSQLite.connect(filePath);
 
                 String[] userInfo = message.split("#");
@@ -120,10 +121,7 @@ public class Servidor extends WebSocketServer {
         System.out.println("Write 'exit' to stop the server");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
-        UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
-        UtilsSQLite.connect(filePath);
-        UtilsSQLite.connect(saltPath);
-        UtilsSQLite.connect(pepperingPath);
+        UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath, snapshotPath);
     }
 
     public String getConnectionId(WebSocket connection) {

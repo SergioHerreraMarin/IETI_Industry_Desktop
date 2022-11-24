@@ -12,10 +12,11 @@ public class UtilsSQLite {
 
     static String basePath = System.getProperty("user.dir");
 
-    static void iniciarDB(String filePath, String saltPath, String pepperPath) {
+    static void iniciarDB(String filePath, String saltPath, String pepperPath, String snapshotPath) {
         Connection conn = connect(filePath);
         Connection connSalt = connect(saltPath);
         Connection connPepper = connect(pepperPath);
+        Connection connSnapshot = connect(snapshotPath);
 
         queryUpdate(conn, "DROP TABLE IF EXISTS user;");
         queryUpdate(conn, "CREATE TABLE IF NOT EXISTS user ("
@@ -31,9 +32,31 @@ public class UtilsSQLite {
         queryUpdate(connPepper, "CREATE TABLE IF NOT EXISTS peppers (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, pepper text NOT NULL);");
 
+        queryUpdate(connSnapshot, "DROP TABLE IF EXISTS snapshot;");
+        queryUpdate(connSnapshot, "CREATE TABLE IF NOT EXISTS snapshot ("
+                + "	id integer PRIMARY KEY AUTOINCREMENT,"
+                + "	state varchar(10000) NOT NULL,"
+                + "	date TEXT NOT NULL, "
+                + "	user varchar(50) NOT NULL" +
+                ");");
+
         queryUpdate(conn,
                 "INSERT INTO user (name, password) VALUES (\"admin\",  \"" + encriptar("hola123")
                         + "\");");
+        queryUpdate(conn,
+                "INSERT INTO user (name, password) VALUES (\"isma\",  \"" + encriptar("prueba")
+                        + "\");");
+        queryUpdate(conn,
+                "INSERT INTO user (name, password) VALUES (\"sergio\",  \"" + encriptar("prueba")
+                        + "\");");
+        queryUpdate(conn,
+                "INSERT INTO user (name, password) VALUES (\"erik\",  \"" + encriptar("prueba")
+                        + "\");");
+
+        disconnect(conn);
+        disconnect(connSalt);
+        disconnect(connPepper);
+        disconnect(connSnapshot);
     }
 
     public static int randomInt(int min, int max) {
