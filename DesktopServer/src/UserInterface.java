@@ -2,6 +2,9 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -24,11 +28,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTable;
 import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableModel;
 
 public class UserInterface extends JFrame {
     static String basePath = System.getProperty("user.dir");
@@ -196,6 +203,18 @@ public class UserInterface extends JFrame {
             }
         });
 
+        loadSnapshot.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cargarInstancia();
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
         panelExterior.add(panelSnapshot);
 
         panelExterior.repaint();
@@ -209,7 +228,7 @@ public class UserInterface extends JFrame {
     }
 
     private void guardarInstancia() {
-        String userSnapshot = "";
+        String snapshotName = "";
 
         // Se conecta a esa base de datos
         Connection conn = UtilsSQLite.connect(filePath);
@@ -218,26 +237,41 @@ public class UserInterface extends JFrame {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         String dataInstancia = LocalDateTime.now().toString().replace("T", " ");
 
-        while (userSnapshot.equals("") || userSnapshot.length() < 3) {
-            userSnapshot = JOptionPane.showInputDialog("Insert a name:");
+        while (snapshotName.equals("") || snapshotName.length() < 3) {
+            snapshotName = JOptionPane.showInputDialog("Insert a name for the snapshot:");
         }
 
         UtilsSQLite.queryUpdate(conn,
-                "INSERT INTO snapshot (state, date, user) VALUES (\"" + data
-                        + "\",  \"" + dataInstancia + "\", \"" + userSnapshot + "\");");
+                "INSERT INTO snapshot (name, stateData, date) VALUES (\"" + snapshotName
+                        + "\",  \"" + data + "\", \"" + dataInstancia + "\");");
 
         JOptionPane.showMessageDialog(null, "Snapshot done", "Snapshot", JOptionPane.INFORMATION_MESSAGE);
 
         UtilsSQLite.disconnect(conn);
     }
 
-    private void cargarInstancia() {
-        // Crea la base de datos de snapshot
-        // UtilsSQLite.snapshot(filePath);
+    private void cargarInstancia() throws SQLException {
+        Connection connSnapshot = UtilsSQLite.connect(filePath);
+        ResultSet infoSnapshot = UtilsSQLite.querySelect(connSnapshot, "SELECT * FROM snapshot;");
+        ResultSet total = UtilsSQLite.querySelect(connSnapshot, "SELECT count(*) FROM snapshot;");
 
-        // Se conecta a esa base de datos
-        Connection conn = UtilsSQLite.connect(filePath);
+        JFrame snapshotSelection = new JFrame("Cargar Snapshot");
 
+        String[] nameSnapshot = new String[total.getInt(1)];
+
+        while (infoSnapshot.next()) {
+
+            for (int i = 0; i < total.getInt(1); i++) {
+                nameSnapshot[i] = infoSnapshot.getString("name");
+            }
+        }
+
+        JList snapshots = new JList<String>(nameSnapshot);
+        snapshots.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        snapshotSelection.add(snapshots);
+        snapshotSelection.setVisible(true);
+        snapshotSelection.setSize(new Dimension(300, 300));
     }
 
     private void resetControls() {

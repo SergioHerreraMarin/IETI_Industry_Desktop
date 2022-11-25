@@ -55,9 +55,9 @@ public class UtilsSQLite {
         queryUpdate(connSnapshot, "DROP TABLE IF EXISTS snapshot;");
         queryUpdate(connSnapshot, "CREATE TABLE IF NOT EXISTS snapshot ("
                 + "	id integer PRIMARY KEY AUTOINCREMENT,"
-                + "	state varchar(10000) NOT NULL,"
-                + "	date TEXT NOT NULL, "
-                + "	user varchar(50) NOT NULL" +
+                + "	name varchar(50) NOT NULL,"
+                + "	stateData varchar(10000) NOT NULL,"
+                + "	date TEXT NOT NULL" +
                 ");");
         disconnect(connSnapshot);
     }
