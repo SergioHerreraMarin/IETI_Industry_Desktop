@@ -79,7 +79,7 @@ public class Servidor extends WebSocketServer {
         try {
             if (message.contains("UC")) {
 
-                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath, snapshotPath);
+                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
                 Connection connection = UtilsSQLite.connect(filePath);
 
                 String[] userInfo = message.split("#");
@@ -121,7 +121,7 @@ public class Servidor extends WebSocketServer {
         System.out.println("Write 'exit' to stop the server");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
-        UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath, snapshotPath);
+        UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
     }
 
     public String getConnectionId(WebSocket connection) {

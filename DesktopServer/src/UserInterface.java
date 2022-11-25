@@ -95,6 +95,7 @@ public class UserInterface extends JFrame {
             case JFileChooser.APPROVE_OPTION:
                 model.resetData();
                 if (model.setCurrentFile(fileChooser.getSelectedFile())) {
+                    resetControls();
                     loadControls();
                 }
                 break;
@@ -222,7 +223,7 @@ public class UserInterface extends JFrame {
         }
 
         UtilsSQLite.queryUpdate(conn,
-                "INSERT INTO snapshot (state, date, user) VALUES (\"" + Model.currentComponentValuesToApp()
+                "INSERT INTO snapshot (state, date, user) VALUES (\"" + data
                         + "\",  \"" + dataInstancia + "\", \"" + userSnapshot + "\");");
 
         JOptionPane.showMessageDialog(null, "Snapshot done", "Snapshot", JOptionPane.INFORMATION_MESSAGE);
@@ -237,6 +238,12 @@ public class UserInterface extends JFrame {
         // Se conecta a esa base de datos
         Connection conn = UtilsSQLite.connect(filePath);
 
+    }
+
+    private void resetControls() {
+        panelExterior.removeAll();
+        panelExterior.revalidate();
+        panelExterior.repaint();
     }
 
 }

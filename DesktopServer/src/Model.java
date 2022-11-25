@@ -191,12 +191,14 @@ public class Model {
                             Element elementDropdown = (Element) nodelistDropdown.item(m);
                             try {
                                 Integer.parseInt(elementDropdown.getAttribute("id"));
+                                elementDropdown.getAttribute("label");
                             } catch (NumberFormatException e) {
                                 JFrame jFrame = new JFrame();
                                 JOptionPane.showMessageDialog(jFrame,
                                         "The ID must be a number: Dropdown ID!!!\n" + e.getMessage());
                                 return false;
                             }
+
                             // Bucle options
                             NodeList nodelistOptions = elementDropdown.getElementsByTagName("option");
                             for (int n = 0; n < nodelistOptions.getLength(); n++) {
