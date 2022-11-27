@@ -1,8 +1,8 @@
 <root>
     <controls name="block1">
         <switch id="0" default="on">Label</switch>
-        <slider id="1" default="4.5" min="0" max="10" step="0.5">Label</slider>
-        <dropdown id="2" default="1" label="Etiqueta">
+        <slider id="1" default="4.5" min="0" max="10" step="2">Label</slider>
+        <dropdown id="2" default="1">
             <option value="2">Label 2</option>
             <option value="3">Label 3</option>
         </dropdown>
@@ -10,6 +10,7 @@
     </controls>
 
     <controls name="block2">
+        <slider id="1" default="4.5" min="0" max="10" step="2">Label</slider>
     </controls>
 
 </root>

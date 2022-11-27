@@ -33,6 +33,7 @@ public class Servidor extends WebSocketServer {
 
             this.start();
             System.out.println("Server running in port: " + this.getPort());
+            UtilsSQLite.checkDatabase();
 
             while (running) {
                 String line = in.readLine();
@@ -119,8 +120,6 @@ public class Servidor extends WebSocketServer {
         System.out.println("Write 'exit' to stop the server");
         setConnectionLostTimeout(0);
         setConnectionLostTimeout(100);
-        UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
-        UtilsSQLite.snapshot(snapshotPath);
     }
 
     public String getConnectionId(WebSocket connection) {

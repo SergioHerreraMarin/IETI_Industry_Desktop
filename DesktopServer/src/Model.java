@@ -21,7 +21,7 @@ public class Model {
     private File currentFile;
 
     private static ArrayList<CustomControlPanel> customControls = new ArrayList<CustomControlPanel>();
-    private static ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
+    public static ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
 
     public Model() {
 
@@ -36,7 +36,7 @@ public class Model {
         return readXML();
     }
 
-    public ArrayList<JComponent> getCustomComponents() {
+    public static ArrayList<JComponent> getCustomComponents() {
         return customComponents;
     }
 
@@ -85,12 +85,6 @@ public class Model {
                         try {
                             int idSwitch = Integer.parseInt(elementSwitch.getAttribute("id"));
                             controlId.add(idSwitch);
-                            while (i<controlId.size()) {
-                                if(idSwitch == controlId.get(i)) {
-                                    JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                    return false;
-                                }
-                            }
                             if (elementSwitch.getAttribute("default").equals("on")
                                     || elementSwitch.getAttribute("default").equals("off")) {
                                 CustomSwitch customSwitch = new CustomSwitch(elementSwitch.getAttribute("id"),
@@ -119,12 +113,6 @@ public class Model {
                         try {
                             int idSlider = Integer.parseInt(elementSlider.getAttribute("id"));
                             controlId.add(idSlider);
-                            while (i<controlId.size()) {
-                                if(idSlider == controlId.get(i)) {
-                                    JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                    return false;
-                                }
-                            }
                             if (Float.parseFloat(elementSlider.getAttribute("default")) > Float
                                     .parseFloat(elementSlider.getAttribute("max"))
                                     || Float.parseFloat(elementSlider.getAttribute("default")) < Float
@@ -169,12 +157,6 @@ public class Model {
                         try {
                             int idSensor = Integer.parseInt(elementSensor.getAttribute("id"));
                             controlId.add(idSensor);
-                            while (i<controlId.size()) {
-                                if(idSensor == controlId.get(i)) {
-                                    JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                    return false;
-                                }
-                            }
                         } catch (NumberFormatException e) {
                             JFrame jFrame = new JFrame();
                             JOptionPane.showMessageDialog(jFrame,
@@ -215,12 +197,6 @@ public class Model {
                             try {
                                 int idDropdown = Integer.parseInt(elementDropdown.getAttribute("id"));
                                 controlId.add(idDropdown);
-                                while (i<controlId.size()) {
-                                    if(idDropdown == controlId.get(i)) {
-                                        JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                        return false;
-                                    }
-                                }
                                 elementDropdown.getAttribute("label");
                             } catch (NumberFormatException e) {
                                 JFrame jFrame = new JFrame();

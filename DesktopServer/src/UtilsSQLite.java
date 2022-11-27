@@ -1,3 +1,4 @@
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,6 +12,14 @@ import com.password4j.Password;
 public class UtilsSQLite {
 
     static String basePath = System.getProperty("user.dir");
+
+    static void checkDatabase(){
+        if(new File(basePath + "/src/database.db").exists()){
+            return;
+        } else {
+            iniciarDB(basePath + "/src/database.db", basePath + "/src/salt.db", basePath + "/src/peppering.db");
+        }
+    }
 
     static void iniciarDB(String filePath, String saltPath, String pepperPath) {
         Connection conn = connect(filePath);
