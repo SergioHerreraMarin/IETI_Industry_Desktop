@@ -59,8 +59,6 @@ public class Model {
                 Document doc = documentBuilder.parse(currentFile);
                 doc.getDocumentElement().normalize();
 
-                ArrayList<Integer> controlId = new ArrayList<Integer>();
-
                 // Bucle de controles
                 NodeList nodelistControls = doc.getElementsByTagName("controls");
                 for (int i = 0; i < nodelistControls.getLength(); i++) {
@@ -83,14 +81,7 @@ public class Model {
                     for (int j = 0; j < nodelistSwitch.getLength(); j++) {
                         Element elementSwitch = (Element) nodelistSwitch.item(j); // Current switch
                         try {
-                            int idSwitch = Integer.parseInt(elementSwitch.getAttribute("id"));
-                            controlId.add(idSwitch);
-                            while (i<controlId.size()) {
-                                if(idSwitch == controlId.get(i)) {
-                                    JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                    return false;
-                                }
-                            }
+                            Integer.parseInt(elementSwitch.getAttribute("id"));
                             if (elementSwitch.getAttribute("default").equals("on")
                                     || elementSwitch.getAttribute("default").equals("off")) {
                                 CustomSwitch customSwitch = new CustomSwitch(elementSwitch.getAttribute("id"),
@@ -117,14 +108,7 @@ public class Model {
                         Element elementSlider = (Element) nodelistSlider.item(k); // Current switch
 
                         try {
-                            int idSlider = Integer.parseInt(elementSlider.getAttribute("id"));
-                            controlId.add(idSlider);
-                            while (i<controlId.size()) {
-                                if(idSlider == controlId.get(i)) {
-                                    JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                    return false;
-                                }
-                            }
+                            Integer.parseInt(elementSlider.getAttribute("id"));
                             if (Float.parseFloat(elementSlider.getAttribute("default")) > Float
                                     .parseFloat(elementSlider.getAttribute("max"))
                                     || Float.parseFloat(elementSlider.getAttribute("default")) < Float
@@ -136,8 +120,7 @@ public class Model {
                             } else {
                                 if (Float.parseFloat(elementSlider.getAttribute("step")) > Float
                                         .parseFloat(elementSlider.getAttribute("max"))
-                                        || Float.parseFloat(elementSlider.getAttribute("step")) < Float
-                                                .parseFloat(elementSlider.getAttribute("min"))) {
+                                        || Float.parseFloat(elementSlider.getAttribute("step")) < 0) {
                                     JFrame jFrame = new JFrame();
                                     JOptionPane.showMessageDialog(jFrame,
                                             "The step number is not correct: Slider step number!!!");
@@ -167,14 +150,7 @@ public class Model {
 
                         Element elementSensor = (Element) nodelistSensor.item(l); // Current switch
                         try {
-                            int idSensor = Integer.parseInt(elementSensor.getAttribute("id"));
-                            controlId.add(idSensor);
-                            while (i<controlId.size()) {
-                                if(idSensor == controlId.get(i)) {
-                                    JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                    return false;
-                                }
-                            }
+                            Integer.parseInt(elementSensor.getAttribute("id"));
                         } catch (NumberFormatException e) {
                             JFrame jFrame = new JFrame();
                             JOptionPane.showMessageDialog(jFrame,
@@ -213,22 +189,13 @@ public class Model {
                             ArrayList<String> optionsArrayList = new ArrayList<String>();
                             Element elementDropdown = (Element) nodelistDropdown.item(m);
                             try {
-                                int idDropdown = Integer.parseInt(elementDropdown.getAttribute("id"));
-                                controlId.add(idDropdown);
-                                while (i<controlId.size()) {
-                                    if(idDropdown == controlId.get(i)) {
-                                        JOptionPane.showMessageDialog(null, "The ids cannot be the same");
-                                        return false;
-                                    }
-                                }
-                                elementDropdown.getAttribute("label");
+                                Integer.parseInt(elementDropdown.getAttribute("id"));
                             } catch (NumberFormatException e) {
                                 JFrame jFrame = new JFrame();
                                 JOptionPane.showMessageDialog(jFrame,
                                         "The ID must be a number: Dropdown ID!!!\n" + e.getMessage());
                                 return false;
                             }
-
                             // Bucle options
                             NodeList nodelistOptions = elementDropdown.getElementsByTagName("option");
                             for (int n = 0; n < nodelistOptions.getLength(); n++) {
@@ -315,13 +282,58 @@ public class Model {
 
                 }
             }
-            data += ";";
+            data += "¿" + currentControlId + ";";
         }
 
         return data;
     }
 
-    public void resetData() {
+    public static void updateComponent(String message){
+
+        String idBlock = "", idComponent = "",  currentComponentValue = "";
+
+        String[] componentProperties = message.split("!");
+
+        for(String propert : componentProperties){
+            String[] nameValue = propert.split(":"); //[0] value name, [1] value
+
+            switch(nameValue[0]){
+                case "blockID":
+                    idBlock = nameValue[1];
+                    break;
+                case "id":
+                    idComponent = nameValue[1];
+                    break;
+                case "current":
+                    currentComponentValue = nameValue[1];
+                    break;
+                default:
+                    System.out.println("Valor no encontrado");
+                break;
+
+            }
+        }
+
+        for(Object comp : Model.customComponents){
+            if(comp instanceof CustomSlider){
+                if(((CustomSlider)comp).getId().equals(idComponent)){
+                    ((CustomSlider)comp).setDefaultValue(Float.valueOf(currentComponentValue));
+
+                }
+            }else if(comp instanceof CustomDropdown){
+                if(((CustomDropdown)comp).getId().equals(idComponent)){
+                    ((CustomDropdown)comp).setDefaultValue(Integer.valueOf(currentComponentValue));
+                }
+            }else if(comp instanceof CustomSwitch){
+                if(((CustomSwitch)comp).getId().equals(idComponent)){
+                    ((CustomSwitch)comp).setDefaultValue(currentComponentValue);
+                }
+            }
+        }
+
+    }
+
+    public static void resetData() {
         customComponents.clear();
         customControls.clear();
     }

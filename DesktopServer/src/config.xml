@@ -10,12 +10,12 @@
     </controls>
     <controls name="block2">
         <slider id="4" default="2" min="1" max="13" step="3">LabelSlider</slider>
-        <slider id="4" default="7" min="1" max="13" step="3">LabelSlider</slider>
-        <switch id="5" default="off">LabelSwitch</switch>
+        <slider id="5" default="7" min="1" max="13" step="3">LabelSlider</slider>
+        <switch id="6" default="off">LabelSwitch</switch>
     </controls>
     <controls name="block3">
-        <slider id="6" default="1" min="1" max="13" step="3">LabelSlider</slider>
-        <switch id="7" default="off">LabelSwitch</switch>
-        <slider id="8" default="10" min="1" max="13" step="3">LabelSlider</slider>
+        <slider id="7" default="1" min="1" max="13" step="3">LabelSlider</slider>
+        <switch id="8" default="off">LabelSwitch</switch>
+        <slider id="9" default="10" min="1" max="13" step="3">LabelSlider</slider>
     </controls>
 </root>

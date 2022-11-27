@@ -34,32 +34,6 @@ public class UtilsSQLite {
         queryUpdate(conn,
                 "INSERT INTO user (name, password) VALUES (\"admin\",  \"" + encriptar("hola123")
                         + "\");");
-        queryUpdate(conn,
-                "INSERT INTO user (name, password) VALUES (\"isma\",  \"" + encriptar("prueba")
-                        + "\");");
-        queryUpdate(conn,
-                "INSERT INTO user (name, password) VALUES (\"sergio\",  \"" + encriptar("prueba")
-                        + "\");");
-        queryUpdate(conn,
-                "INSERT INTO user (name, password) VALUES (\"erik\",  \"" + encriptar("prueba")
-                        + "\");");
-
-        disconnect(conn);
-        disconnect(connSalt);
-        disconnect(connPepper);
-
-    }
-
-    public static void snapshot(String snapshotPath) {
-        Connection connSnapshot = connect(snapshotPath);
-        queryUpdate(connSnapshot, "DROP TABLE IF EXISTS snapshot;");
-        queryUpdate(connSnapshot, "CREATE TABLE IF NOT EXISTS snapshot ("
-                + "	id integer PRIMARY KEY AUTOINCREMENT,"
-                + "	name varchar(50) NOT NULL,"
-                + "	stateData varchar(10000) NOT NULL,"
-                + "	date TEXT NOT NULL" +
-                ");");
-        disconnect(connSnapshot);
     }
 
     public static int randomInt(int min, int max) {
