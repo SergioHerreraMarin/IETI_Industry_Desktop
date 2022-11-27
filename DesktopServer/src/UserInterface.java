@@ -1,11 +1,8 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,22 +10,18 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.FlowLayout;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -38,7 +31,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableModel;
 
 public class UserInterface extends JFrame {
     static String basePath = System.getProperty("user.dir");
@@ -63,15 +58,16 @@ public class UserInterface extends JFrame {
         model = new Model();
         initInterface();
         createMenuBar();
+
         Border emptyBorder = BorderFactory.createEmptyBorder(20, 20, 20, 20);
         panelExterior = new JPanel(new GridLayout(0, 1));
-        panelSnapshot = new JPanel(new FlowLayout());
         panelExterior.setBorder(emptyBorder);
         panelExterior.setPreferredSize(new Dimension(1000, 600));
         JScrollPane scrollPanel = new JScrollPane(panelExterior);
 
         this.add(scrollPanel, BorderLayout.CENTER);
         this.setVisible(true);
+        
     }
 
     private void createMenuBar() {
@@ -106,9 +102,10 @@ public class UserInterface extends JFrame {
 
         switch (chooserStatus) {
             case JFileChooser.APPROVE_OPTION:
-                model.resetData();
+                
+                resetPanels();
+
                 if (model.setCurrentFile(fileChooser.getSelectedFile())) {
-                    resetControls();
                     loadControls();
                 }
                 break;
@@ -117,66 +114,74 @@ public class UserInterface extends JFrame {
 
     private void loadControls() {
 
-        for (JComponent component : model.getCustomComponents()) {
+        for(JComponent component : model.getCustomComponents()) {
 
-            if (component instanceof CustomSlider) {
+            if(component instanceof CustomSlider) {
 
-                JSlider slider = ((CustomSlider) component).createCustomSlider();
                 for (CustomControlPanel controlPanel : model.getControlBlockData()) {
                     if (controlPanel.getControlId().equals(((CustomSlider) component).getBlock())) {
-                        controlPanel.addSlidersToPanel(slider);
+                        controlPanel.addSlidersToPanel(((CustomSlider) component));
                     }
                 }
-
-                slider.addChangeListener(new ChangeListener() { // ----------------------------------------------Para
-                                                                // actualizar componentes..
+            
+                ((CustomSlider) component).addMouseListener(new MouseInputAdapter() {
                     @Override
-                    public void stateChanged(ChangeEvent e) {
-                        ((CustomSlider) component).setDefaultValue(slider.getValue());
+                    public void mouseReleased(MouseEvent e) {
+                        ((CustomSlider) component).setDefaultValue(((CustomSlider) component).getValue());
+                        String data;
+                        data = "blockID:" + ((CustomSlider)component).getBlock() + "!id:" + ((CustomSlider)component).getId() + "!current:" + ((CustomSlider)component).getDefaultValue();
+                        Servidor.updateClientComponents(data);   
                     }
                 });
 
-            } else if (component instanceof CustomSwitch) {
+            }else if(component instanceof CustomSwitch) {
 
-                JToggleButton tggleButtonn = ((CustomSwitch) component).createCustomSwitch();
+
                 for (CustomControlPanel controlPanel : model.getControlBlockData()) {
                     if (controlPanel.getControlId().equals(((CustomSwitch) component).getBlock())) {
-                        controlPanel.addToggleToPanel(tggleButtonn);
+                        controlPanel.addToggleToPanel(((CustomSwitch) component));
                     }
                 }
 
-                tggleButtonn.addChangeListener(new ChangeListener() {
+                ((CustomSwitch) component).addChangeListener(new ChangeListener() {
                     @Override
                     public void stateChanged(ChangeEvent e) {
 
                         String toggleValue;
-                        if (tggleButtonn.isSelected()) {
+                        if (((CustomSwitch) component).isSelected()) {
                             toggleValue = "on";
                         } else {
                             toggleValue = "off";
                         }
 
                         ((CustomSwitch) component).setDefaultValue(toggleValue);
+                        
+                        String data;
+                        data = "blockID:" + ((CustomSwitch)component).getBlock() + "!id:" + ((CustomSwitch)component).getId() + "!current:" + ((CustomSwitch)component).getDefaultValue();
+                        Servidor.updateClientComponents(data);
                     }
                 });
 
-            } else if (component instanceof CustomDropdown) {
+            }else if(component instanceof CustomDropdown) {
 
-                JComboBox dropdown = ((CustomDropdown) component).createCustomDropdown();
                 for (CustomControlPanel controlPanel : model.getControlBlockData()) {
                     if (controlPanel.getControlId().equals(((CustomDropdown) component).getBlock())) {
-                        controlPanel.addDropdownToPanel(dropdown);
+                        controlPanel.addDropdownToPanel(((CustomDropdown) component));
                     }
                 }
-
-                dropdown.addActionListener(new ActionListener() {
+                    
+                ((CustomDropdown) component).addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        ((CustomDropdown) component).setDefaultValue(dropdown.getSelectedIndex());
+                        ((CustomDropdown) component).setDefaultValue(((CustomDropdown) component).getSelectedIndex());
+
+                        String data;
+                        data = "blockID:" + ((CustomDropdown)component).getBlock() + "!id:" + ((CustomDropdown)component).getId() + "!current:" + ((CustomDropdown)component).getDefaultValue();
+                        Servidor.updateClientComponents(data);
                     }
                 });
 
-            } else if (component instanceof CustomSensor) {
+            }else if(component instanceof CustomSensor) {
 
                 ArrayList<JLabel> sensorData = ((CustomSensor) component).createCustomSensor();
 
@@ -188,7 +193,7 @@ public class UserInterface extends JFrame {
                     }
                 }
 
-            } else {
+            }else{
                 System.out.println("Clase no encontrada");
             }
         }
@@ -226,14 +231,13 @@ public class UserInterface extends JFrame {
         panelExterior.revalidate();
     }
 
+
     private void initInterface() {
 
         this.setSize(WIDTH, HEIGHT);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    private void guardarInstancia() {
-        String snapshotName = "";
 
         // Se conecta a esa base de datos
         Connection conn = UtilsSQLite.connect(filePath);

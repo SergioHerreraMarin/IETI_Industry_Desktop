@@ -1,3 +1,6 @@
+import java.util.Hashtable;
+
+import javax.swing.JLabel;
 import javax.swing.JSlider;
 
 public class CustomSlider extends JSlider {
@@ -20,11 +23,21 @@ public class CustomSlider extends JSlider {
         this.max = max;
         this.step = step;
 
+        this.setValue((int)this.defaultValue);
+        this.setMaximum((int)this.max);
+        this.setMinimum((int)this.min);
+        this.setMajorTickSpacing((int)this.step);
+
+        this.setPaintLabels(true);
+
+        Hashtable positions = new Hashtable<>();
+        positions.put((int)min, new JLabel(String.valueOf(min)));
+        positions.put((int)max, new JLabel(String.valueOf(max)));
+        this.setLabelTable(positions);
+
     }
 
     
-    
-
     public String getId() {
         return id;
     }
@@ -55,6 +68,7 @@ public class CustomSlider extends JSlider {
 
     public void setDefaultValue(float defaultValue) {
         this.defaultValue = defaultValue;
+        this.setValue((int)this.defaultValue);
     }
 
     public float getMin() {
@@ -79,18 +93,6 @@ public class CustomSlider extends JSlider {
 
     public void setStep(float step) {
         this.step = step;
-    }
-
-
-    public JSlider createCustomSlider(){
-
-        JSlider slider = new JSlider();
-        slider.setValue((int)this.defaultValue);
-        slider.setMaximum((int)this.max);
-        slider.setMinimum((int)this.min);
-        slider.setMajorTickSpacing((int)this.step);
-
-        return slider;
     }
 
 

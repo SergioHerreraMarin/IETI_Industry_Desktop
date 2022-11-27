@@ -17,6 +17,12 @@ public class CustomDropdown extends JComboBox {
         this.label = label;
         this.defaultValue = defaultValue;
         this.options = options;
+
+        for(String option : this.options){
+            this.addItem(option);
+        }
+
+        this.setSelectedIndex(defaultValue);  
     }
 
     public String getId() {
@@ -49,6 +55,7 @@ public class CustomDropdown extends JComboBox {
 
     public void setDefaultValue(int defaultValue) {
         this.defaultValue = defaultValue;
+        this.setSelectedIndex(defaultValue);
     }
 
     public ArrayList<String> getOptions() {
@@ -57,19 +64,6 @@ public class CustomDropdown extends JComboBox {
 
     public void setOptions(ArrayList<String> options) {
         this.options = options;
-    }
-
-
-    public JComboBox createCustomDropdown(){
-
-        JComboBox dropdown = new JComboBox<>();
-
-        for(String option : this.options){
-            dropdown.addItem(option);
-        }
-
-        dropdown.setSelectedIndex(defaultValue);   
-        return dropdown;
     }
 
 

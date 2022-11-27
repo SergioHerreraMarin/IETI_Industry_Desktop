@@ -12,20 +12,20 @@ import org.java_websocket.server.WebSocketServer;
 public class Servidor extends WebSocketServer {
 
     static BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
+    
     String basePath = System.getProperty("user.dir");
-
     // Paths de los archivos
-    String filePath = basePath + "/src/database.db";
-    String saltPath = basePath + "/src/salt.db";
-    String pepperingPath = basePath + "/src/peppering.db";
-    String snapshotPath = basePath + "/src/snapshot.db";
+    String filePath = basePath + "/src/" + "database.db";
+    String saltPath = basePath + "/src/" + "salt.db";
+    String pepperingPath = basePath + "/src/" + "peppering.db";
+
+    static Servidor prueba;
 
     public Servidor(int port) throws UnknownHostException {
         super(new InetSocketAddress(port));
-
+        prueba = this;
         try {
-
+        
             boolean running = true;
 
             // Deshabilitar SSLv3 per clients Android
@@ -42,18 +42,18 @@ public class Servidor extends WebSocketServer {
                     running = false;
                 }
             }
-
+        
             System.out.println("Stopping Server...");
             this.stop(1000);
-
+        
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }      
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-
+        
         // Saludem personalment al nou client
         conn.send("Welcome to IETI Industry");
 
@@ -79,6 +79,8 @@ public class Servidor extends WebSocketServer {
 
         try {
             if (message.contains("UC")) {
+
+                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
                 Connection connection = UtilsSQLite.connect(filePath);
 
                 String[] userInfo = message.split("#");
@@ -95,11 +97,16 @@ public class Servidor extends WebSocketServer {
                         broadcast("NV");
                     }
                 }
-
-            } else if (message.equals("XML")) {
-                System.out.println("Components sent");
+                
+            }else if (message.equals("XML")) {
+                System.out.println(Model.currentComponentValuesToApp());
                 broadcast(Model.currentComponentValuesToApp());
+            
+            }else if(message.contains("current")){
+                System.out.println("UPDATE COMPONENT: " + message);
+                Model.updateComponent(message);
             }
+
 
         } catch (Exception e) {
             // TODO: handle exception
@@ -125,5 +132,9 @@ public class Servidor extends WebSocketServer {
     public String getConnectionId(WebSocket connection) {
         String name = connection.toString();
         return name.replaceAll("org.java_websocket.WebSocketImpl@", "").substring(0, 3);
+    }
+    
+    public static void updateClientComponents(String message){
+        prueba.broadcast(message);
     }
 }

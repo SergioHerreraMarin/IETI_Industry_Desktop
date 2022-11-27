@@ -12,6 +12,14 @@ public class CustomSwitch extends JToggleButton {
         this.block = block;
         this.label = label;
         this.defaultValue = defaultValue;
+
+        if(defaultValue.equals("on")){
+            this.setSelected(true);
+        }else{
+            this.setSelected(false);
+        }
+
+        this.setText(this.label);
     }
 
     public String getId() {
@@ -44,21 +52,12 @@ public class CustomSwitch extends JToggleButton {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
-    }
 
-
-    public JToggleButton createCustomSwitch(){
-        JToggleButton toggleButton = new JToggleButton();
-        
         if(defaultValue.equals("on")){
-            toggleButton.setSelected(true);
+            this.setSelected(true);
         }else{
-            toggleButton.setSelected(false);
+            this.setSelected(false);
         }
-
-        toggleButton.setText(this.label);
-
-        return toggleButton;
     }
 
 
