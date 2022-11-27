@@ -284,9 +284,10 @@ public class UserInterface extends JFrame {
     }
 
     public void loadControlsSnapshot(String[] controls){
+        resetPanels();
 
         for(String control : controls){ //Por cada control crea uno.
-            
+
             String[] componentsBlockid = control.split("¿"); //[0] = componente [1] bloque id
 
             CustomControlPanel customControl = new CustomControlPanel(componentsBlockid[1]);
@@ -448,10 +449,7 @@ public class UserInterface extends JFrame {
             }
             model.customControls.add(customControl);
         }
-
-
         
-        resetPanels();
         model.setCustomComponents(snapshotComponents);
         loadControls();
     }
@@ -519,9 +517,16 @@ public class UserInterface extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int id = ids.get(values.indexOf(listSnapshots.getSelectedValue()));
-				snapshotSelection.dispose();
                 loadSnapshot(id);
-                JOptionPane.showMessageDialog(new JFrame(), "Snapshot loaded");
+
+                try {
+                    int res = JOptionPane.showOptionDialog(null, "Snapshot loaded correctly", "Load Snapshot", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                    if(res == JOptionPane.OK_OPTION){
+                        snapshotSelection.dispose();
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
         });
 
