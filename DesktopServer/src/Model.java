@@ -20,7 +20,7 @@ public class Model {
 
     private File currentFile;
 
-    private static ArrayList<CustomControlPanel> customControls = new ArrayList<CustomControlPanel>();
+    public static ArrayList<CustomControlPanel> customControls = new ArrayList<CustomControlPanel>();
     public static ArrayList<JComponent> customComponents = new ArrayList<JComponent>();
 
     public Model() {

@@ -2,12 +2,15 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
@@ -19,13 +22,13 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
@@ -33,12 +36,13 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableModel;
 
 public class UserInterface extends JFrame {
     static String basePath = System.getProperty("user.dir");
     static String filePath = basePath + "/src/snapshot.db";
+
     static ArrayList<JComponent> snapshotComponents = new ArrayList<JComponent>();
+
     static ArrayList<String> snapshotControls = new ArrayList<String>();
 
     private final int WIDTH = 1300;
@@ -102,9 +106,7 @@ public class UserInterface extends JFrame {
 
         switch (chooserStatus) {
             case JFileChooser.APPROVE_OPTION:
-                
                 resetPanels();
-
                 if (model.setCurrentFile(fileChooser.getSelectedFile())) {
                     loadControls();
                 }
@@ -203,6 +205,12 @@ public class UserInterface extends JFrame {
             panelExterior.add(controlPanel);
         }
 
+        GUISnapshot();
+    }
+
+    public void GUISnapshot(){
+        panelSnapshot = new JPanel();
+
         // SNAPSHOTS
         panelSnapshot.add(snapshot);
         panelSnapshot.add(loadSnapshot);
@@ -220,7 +228,6 @@ public class UserInterface extends JFrame {
                 try {
                     cargarInstancia();
                 } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             }
@@ -233,12 +240,12 @@ public class UserInterface extends JFrame {
 
 
     private void initInterface() {
-
         this.setSize(WIDTH, HEIGHT);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-
+    public void guardarInstancia(){
+        String snapshotName = "";
         // Se conecta a esa base de datos
         Connection conn = UtilsSQLite.connect(filePath);
 
@@ -279,8 +286,12 @@ public class UserInterface extends JFrame {
     public void loadControlsSnapshot(String[] controls){
 
         for(String control : controls){ //Por cada control crea uno.
+            
+            String[] componentsBlockid = control.split("¿"); //[0] = componente [1] bloque id
 
-            String components[] = control.split("%");
+            CustomControlPanel customControl = new CustomControlPanel(componentsBlockid[1]);
+
+            String components[] = componentsBlockid[0].split("%");
             for(String component : components){
                 if(component.length() != 0){
                     String keyValues[] = component.split(":");
@@ -302,7 +313,7 @@ public class UserInterface extends JFrame {
                                     case "block":
                                         sliderBlock = keysValues[1];
                                         break;
-                                        case "label":
+                                    case "label":
                                         sliderLabel = keysValues[1];
                                         break;
                                     case "defaultValue":
@@ -325,15 +336,15 @@ public class UserInterface extends JFrame {
                             CustomSlider slider = new CustomSlider(sliderId, sliderBlock, sliderLabel, sliderDefaultValue, sliderMin, sliderMax, sliderStep);
                             snapshotComponents.add(slider);
                             break;
-                            
+
                         case "CustomSwitch":
-                        
-                        String switchId = "", switchBlock = "", switchLabel = "", switchDefaultValue = "";
-                        String[] keyValuesSwitch = keyValues[1].split(",");
-                        
-                        for(String keyValue: keyValuesSwitch){
+
+                            String switchId = "", switchBlock = "", switchLabel = "", switchDefaultValue = "";
+                            String[] keyValuesSwitch = keyValues[1].split(",");
+
+                            for(String keyValue: keyValuesSwitch){
                                 String keysValues[] = keyValue.split("=");
-                                
+
                                 switch(keysValues[0].trim()){
                                     case "id":
                                         switchId = keysValues[1];
@@ -347,11 +358,10 @@ public class UserInterface extends JFrame {
                                     case "defaultValue":
                                         switchDefaultValue = keysValues[1];
                                         break;
-                                        default:
+                                    default:
                                         break;
                                 }
                             }
-
                             //CREATE CUSTOM SWITCH
                             CustomSwitch switchs = new CustomSwitch(switchId, switchBlock, switchLabel, switchDefaultValue);
                             snapshotComponents.add(switchs);
@@ -360,10 +370,10 @@ public class UserInterface extends JFrame {
                         case "CustomSensor":
 
                             String sensorId = "", sensorBlock = "", sensorLabel = "", sensorUnits = "", sensorThresholdlow = "", sensorThresholdhigh = "";
-
                             String[] keyValuesSensor = keyValues[1].split(",");
 
                             for(String keyValue: keyValuesSensor){
+                                
                                 String keysValues[] = keyValue.split("=");
 
                                 switch(keysValues[0].trim()){
@@ -390,7 +400,7 @@ public class UserInterface extends JFrame {
                             }
                             //CREATE CUSTOM SENSOR
                             CustomSensor sensor = new CustomSensor(sensorId, sensorBlock, sensorLabel, sensorUnits, sensorThresholdlow, sensorThresholdhigh);
-                            snapshotComponents.add(sensor);
+                            customControl.addSensorToPanel(sensor);
                             break;
 
                         case "CustomDropdown":
@@ -436,11 +446,14 @@ public class UserInterface extends JFrame {
                     }
                 }
             }
+            model.customControls.add(customControl);
         }
+
+
         
-        resetControls();
-        // model.resetData();
+        resetPanels();
         model.setCustomComponents(snapshotComponents);
+        loadControls();
     }
 
     private void cargarInstancia() throws SQLException {
@@ -484,8 +497,9 @@ public class UserInterface extends JFrame {
 			ids.add(s.getKey());
             numSnapshots++;
 		}
+        
+        height = (numSnapshots * 100) - 10;
 
-        height = (numSnapshots * 50) - 10;
 
         JList listSnapshots = new JList();
 		listSnapshots.setListData(values.toArray());
@@ -507,7 +521,6 @@ public class UserInterface extends JFrame {
                 int id = ids.get(values.indexOf(listSnapshots.getSelectedValue()));
 				snapshotSelection.dispose();
                 loadSnapshot(id);
-                loadControls();
                 JOptionPane.showMessageDialog(new JFrame(), "Snapshot loaded");
             }
         });
@@ -517,7 +530,8 @@ public class UserInterface extends JFrame {
         snapshotSelection.setSize(new Dimension(300, height));
     }
 
-    private void resetControls() {
+    private void resetPanels() {
+        Model.resetData();
         panelExterior.removeAll();
         panelExterior.revalidate();
         panelExterior.repaint();

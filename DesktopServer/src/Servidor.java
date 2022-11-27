@@ -15,9 +15,10 @@ public class Servidor extends WebSocketServer {
     
     String basePath = System.getProperty("user.dir");
     // Paths de los archivos
-    String filePath = basePath + "/src/" + "database.db";
-    String saltPath = basePath + "/src/" + "salt.db";
-    String pepperingPath = basePath + "/src/" + "peppering.db";
+    String filePath = basePath + "/src/database.db";
+    String saltPath = basePath + "/src/salt.db";
+    String pepperingPath = basePath + "/src/peppering.db";
+    String snapshotPath = basePath + "/src/snapshot.db";
 
     static Servidor prueba;
 
@@ -79,8 +80,6 @@ public class Servidor extends WebSocketServer {
 
         try {
             if (message.contains("UC")) {
-
-                UtilsSQLite.iniciarDB(filePath, saltPath, pepperingPath);
                 Connection connection = UtilsSQLite.connect(filePath);
 
                 String[] userInfo = message.split("#");

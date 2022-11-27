@@ -17,14 +17,15 @@ public class UtilsSQLite {
         if(new File(basePath + "/src/database.db").exists()){
             return;
         } else {
-            iniciarDB(basePath + "/src/database.db", basePath + "/src/salt.db", basePath + "/src/peppering.db");
+            iniciarDB(basePath + "/src/database.db", basePath + "/src/salt.db", basePath + "/src/peppering.db", basePath + "/src/snapshot.db");
         }
     }
 
-    static void iniciarDB(String filePath, String saltPath, String pepperPath) {
+    static void iniciarDB(String filePath, String saltPath, String pepperPath, String snapshotPath) {
         Connection conn = connect(filePath);
         Connection connSalt = connect(saltPath);
         Connection connPepper = connect(pepperPath);
+        Connection connSnapshot = connect(snapshotPath);
 
         queryUpdate(conn, "DROP TABLE IF EXISTS user;");
         queryUpdate(conn, "CREATE TABLE IF NOT EXISTS user ("
@@ -43,6 +44,24 @@ public class UtilsSQLite {
         queryUpdate(conn,
                 "INSERT INTO user (name, password) VALUES (\"admin\",  \"" + encriptar("hola123")
                         + "\");");
+                        
+        queryUpdate(connSnapshot, "DROP TABLE IF EXISTS snapshot;");
+        queryUpdate(connSnapshot, "CREATE TABLE IF NOT EXISTS snapshot (" 
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "name varchar(50) NOT NULL," 
+                + "stateData varchar(10000) NOT NULL," 
+                + "date text NOT NULL"
+                + ");");
+
+        disconnect(conn);
+        disconnect(connSalt);
+        disconnect(connPepper);
+        disconnect(connSnapshot);
+    }
+
+    static void snapshot(String snapshotPath){
+
+
     }
 
     public static int randomInt(int min, int max) {
