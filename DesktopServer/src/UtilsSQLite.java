@@ -13,11 +13,12 @@ public class UtilsSQLite {
 
     static String basePath = System.getProperty("user.dir");
 
-    static void checkDatabase(){
-        if(new File(basePath + "/src/database.db").exists()){
+    static void checkDatabase() {
+        if (new File(basePath + "/src/database.db").exists()) {
             return;
         } else {
-            iniciarDB(basePath + "/src/database.db", basePath + "/src/salt.db", basePath + "/src/peppering.db", basePath + "/src/snapshot.db");
+            iniciarDB(basePath + "/src/database.db", basePath + "/src/salt.db", basePath + "/src/peppering.db",
+                    basePath + "/src/snapshot.db");
         }
     }
 
@@ -44,12 +45,12 @@ public class UtilsSQLite {
         queryUpdate(conn,
                 "INSERT INTO user (name, password) VALUES (\"admin\",  \"" + encriptar("hola123")
                         + "\");");
-                        
+
         queryUpdate(connSnapshot, "DROP TABLE IF EXISTS snapshot;");
-        queryUpdate(connSnapshot, "CREATE TABLE IF NOT EXISTS snapshot (" 
+        queryUpdate(connSnapshot, "CREATE TABLE IF NOT EXISTS snapshot ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "name varchar(50) NOT NULL," 
-                + "stateData varchar(10000) NOT NULL," 
+                + "name varchar(50) NOT NULL,"
+                + "stateData varchar(10000) NOT NULL,"
                 + "date text NOT NULL"
                 + ");");
 
@@ -57,11 +58,6 @@ public class UtilsSQLite {
         disconnect(connSalt);
         disconnect(connPepper);
         disconnect(connSnapshot);
-    }
-
-    static void snapshot(String snapshotPath){
-
-
     }
 
     public static int randomInt(int min, int max) {

@@ -3,26 +3,26 @@ import java.util.ArrayList;
 import javax.swing.JComboBox;
 
 public class CustomDropdown extends JComboBox {
-    
+
     private String id;
     private String block;
     private String label;
     private int defaultValue;
     private ArrayList<String> options = new ArrayList<String>();
- 
+
     public CustomDropdown(String id, String block, String label, int defaultValue, ArrayList<String> options) {
-        
+
         this.id = id;
         this.block = block;
         this.label = label;
         this.defaultValue = defaultValue;
         this.options = options;
 
-        for(String option : this.options){
+        for (String option : this.options) {
             this.addItem(option);
         }
 
-        this.setSelectedIndex(defaultValue);  
+        this.setSelectedIndex(defaultValue);
     }
 
     public String getId() {
@@ -56,6 +56,11 @@ public class CustomDropdown extends JComboBox {
     public void setDefaultValue(int defaultValue) {
         this.defaultValue = defaultValue;
         this.setSelectedIndex(defaultValue);
+        String data;
+        data = "blockID:" + getBlock() + "!id:"
+                + getId() + "!current:"
+                + getDefaultValue();
+        Servidor.updateClientComponents(data);
     }
 
     public ArrayList<String> getOptions() {
@@ -66,21 +71,19 @@ public class CustomDropdown extends JComboBox {
         this.options = options;
     }
 
-
-    private String readDropdownOptions(){
+    private String readDropdownOptions() {
         String opt = "";
-        
-        for(int i = 0; i < options.size(); i++){
-            if(i < options.size() - 1){
+
+        for (int i = 0; i < options.size(); i++) {
+            if (i < options.size() - 1) {
                 opt += options.get(i) + "!";
-            }else{
+            } else {
                 opt += options.get(i);
             }
         }
-        
+
         return opt;
     }
-
 
     @Override
     public String toString() {

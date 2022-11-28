@@ -4,7 +4,7 @@ import javax.swing.JLabel;
 import javax.swing.JSlider;
 
 public class CustomSlider extends JSlider {
-    
+
     private String id;
     private String block;
     private String label;
@@ -12,7 +12,6 @@ public class CustomSlider extends JSlider {
     private float min;
     private float max;
     private float step;
-
 
     public CustomSlider(String id, String block, String label, float defaultValue, float min, float max, float step) {
         this.id = id;
@@ -23,21 +22,20 @@ public class CustomSlider extends JSlider {
         this.max = max;
         this.step = step;
 
-        this.setValue((int)this.defaultValue);
-        this.setMaximum((int)this.max);
-        this.setMinimum((int)this.min);
-        this.setMajorTickSpacing((int)this.step);
+        this.setValue((int) this.defaultValue);
+        this.setMaximum((int) this.max);
+        this.setMinimum((int) this.min);
+        this.setMajorTickSpacing((int) this.step);
 
         this.setPaintLabels(true);
 
         Hashtable positions = new Hashtable<>();
-        positions.put((int)min, new JLabel(String.valueOf(min)));
-        positions.put((int)max, new JLabel(String.valueOf(max)));
+        positions.put((int) min, new JLabel(String.valueOf(min)));
+        positions.put((int) max, new JLabel(String.valueOf(max)));
         this.setLabelTable(positions);
 
     }
 
-    
     public String getId() {
         return id;
     }
@@ -68,7 +66,12 @@ public class CustomSlider extends JSlider {
 
     public void setDefaultValue(float defaultValue) {
         this.defaultValue = defaultValue;
-        this.setValue((int)this.defaultValue);
+        this.setValue((int) this.defaultValue);
+        String data;
+        data = "blockID:" + getBlock() + "!id:"
+                + getId() + "!current:"
+                + getDefaultValue();
+        Servidor.updateClientComponents(data);
     }
 
     public float getMin() {
@@ -94,7 +97,6 @@ public class CustomSlider extends JSlider {
     public void setStep(float step) {
         this.step = step;
     }
-
 
     @Override
     public String toString() {

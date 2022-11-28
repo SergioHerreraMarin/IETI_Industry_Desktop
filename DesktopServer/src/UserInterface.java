@@ -129,11 +129,6 @@ public class UserInterface extends JFrame {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         ((CustomSlider) component).setDefaultValue(((CustomSlider) component).getValue());
-                        String data;
-                        data = "blockID:" + ((CustomSlider) component).getBlock() + "!id:"
-                                + ((CustomSlider) component).getId() + "!current:"
-                                + ((CustomSlider) component).getDefaultValue();
-                        Servidor.updateClientComponents(data);
                     }
                 });
 
@@ -157,12 +152,6 @@ public class UserInterface extends JFrame {
                         }
 
                         ((CustomSwitch) component).setDefaultValue(toggleValue);
-
-                        String data;
-                        data = "blockID:" + ((CustomSwitch) component).getBlock() + "!id:"
-                                + ((CustomSwitch) component).getId() + "!current:"
-                                + ((CustomSwitch) component).getDefaultValue();
-                        Servidor.updateClientComponents(data);
                     }
                 });
 
@@ -178,12 +167,6 @@ public class UserInterface extends JFrame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         ((CustomDropdown) component).setDefaultValue(((CustomDropdown) component).getSelectedIndex());
-
-                        String data;
-                        data = "blockID:" + ((CustomDropdown) component).getBlock() + "!id:"
-                                + ((CustomDropdown) component).getId() + "!current:"
-                                + ((CustomDropdown) component).getDefaultValue();
-                        Servidor.updateClientComponents(data);
                     }
                 });
 
@@ -408,6 +391,7 @@ public class UserInterface extends JFrame {
                             // CREATE CUSTOM SENSOR
                             CustomSensor sensor = new CustomSensor(sensorId, sensorBlock, sensorLabel, sensorUnits,
                                     sensorThresholdlow, sensorThresholdhigh);
+                            snapshotComponents.add(sensor);
                             customControl.addSensorToPanel(sensor);
                             break;
 
