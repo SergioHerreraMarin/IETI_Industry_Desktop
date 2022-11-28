@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -53,6 +55,9 @@ public class Model {
         if (currentFile != null) {
 
             try {
+                ArrayList<String> controlId = new ArrayList<String>();
+                Set<String> s = new HashSet<String>();
+
                 DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
@@ -82,6 +87,16 @@ public class Model {
                         Element elementSwitch = (Element) nodelistSwitch.item(j); // Current switch
                         try {
                             Integer.parseInt(elementSwitch.getAttribute("id"));
+                            for(int a = 0; a < controlId.size(); a++) {
+                                if (controlId.lastIndexOf(controlId.get(a)) != a)  {
+                                    JFrame jFrame = new JFrame();
+                                    JOptionPane.showMessageDialog(jFrame,
+                                            "The ID is duplicated!\nSwitch ID");
+                                    return false;
+                                }
+                            }
+                            controlId.add(elementSwitch.getAttribute("id"));
+                            
                             if (elementSwitch.getAttribute("default").equals("on")
                                     || elementSwitch.getAttribute("default").equals("off")) {
                                 CustomSwitch customSwitch = new CustomSwitch(elementSwitch.getAttribute("id"),
@@ -109,6 +124,16 @@ public class Model {
 
                         try {
                             Integer.parseInt(elementSlider.getAttribute("id"));
+                            for(int b = 0; b < controlId.size(); b++) {
+                                if (controlId.lastIndexOf(controlId.get(b)) != b)  {
+                                    JFrame jFrame = new JFrame();
+                                    JOptionPane.showMessageDialog(jFrame,
+                                            "The ID is duplicated!\nSlider ID");
+                                    return false;
+                                }
+                            }
+                            controlId.add(elementSlider.getAttribute("id"));
+                            
                             if (Float.parseFloat(elementSlider.getAttribute("default")) > Float
                                     .parseFloat(elementSlider.getAttribute("max"))
                                     || Float.parseFloat(elementSlider.getAttribute("default")) < Float
@@ -151,6 +176,16 @@ public class Model {
                         Element elementSensor = (Element) nodelistSensor.item(l); // Current switch
                         try {
                             Integer.parseInt(elementSensor.getAttribute("id"));
+                            for(int c = 0; c < controlId.size(); c++) {
+                                if (controlId.lastIndexOf(controlId.get(c)) != c)  {
+                                    JFrame jFrame = new JFrame();
+                                    JOptionPane.showMessageDialog(jFrame,
+                                            "The ID is duplicated!\nSensor ID");
+                                    return false;
+                                }
+                            }
+                            controlId.add(elementSensor.getAttribute("id"));
+                        
                         } catch (NumberFormatException e) {
                             JFrame jFrame = new JFrame();
                             JOptionPane.showMessageDialog(jFrame,
@@ -190,6 +225,16 @@ public class Model {
                             Element elementDropdown = (Element) nodelistDropdown.item(m);
                             try {
                                 Integer.parseInt(elementDropdown.getAttribute("id"));
+                                for(int d = 0; d < controlId.size(); d++) {
+                                    if (controlId.lastIndexOf(controlId.get(d)) != d)  {
+                                        JFrame jFrame = new JFrame();
+                                        JOptionPane.showMessageDialog(jFrame,
+                                                "The ID is duplicated!\nDropdown ID");
+                                        return false;
+                                    }
+                                }
+                                controlId.add(elementDropdown.getAttribute("id"));
+                                
                             } catch (NumberFormatException e) {
                                 JFrame jFrame = new JFrame();
                                 JOptionPane.showMessageDialog(jFrame,
