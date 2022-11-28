@@ -1,0 +1,21 @@
+<root>
+    <controls name="block1">
+        <switch id="0" default="on">Label</switch>
+        <slider id="1" default="4.5" min="2" max="10" step="2">Label</slider>
+        <dropdown id="2" default="1">
+            <option value="2">Label 2</option>
+            <option value="3">Label 3</option>
+        </dropdown>
+        <sensor id="3" units="ºC" thresholdlow="5" thresholdhigh="10">Label</sensor>
+    </controls>
+    <controls name="block2">
+        <slider id="4" default="2" min="1" max="13" step="3">LabelSlider</slider>
+        <slider id="5" default="7" min="1" max="13" step="3">LabelSlider</slider>
+        <switch id="6" default="off">LabelSwitch</switch>
+    </controls>
+    <controls name="block3">
+        <slider id="7" default="1" min="1" max="13" step="3">LabelSlider</slider>
+        <switch id="8" default="off">LabelSwitch</switch>
+        <slider id="9" default="10" min="1" max="13" step="3">LabelSlider</slider>
+    </controls>
+</root>
