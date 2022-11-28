@@ -5,25 +5,27 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
+
+import java.awt.Color;
 import java.awt.GridLayout;
 
 public class CustomControlPanel extends JPanel {
-    
+
     private String controlId;
 
-    JPanel panelSliders = new JPanel(new GridLayout(1,0));
-    JPanel panelDropdown = new JPanel(new GridLayout(0,1));
-    JPanel panelToggles = new JPanel(new GridLayout(1,0));
-    JPanel panelSensor = new JPanel(new GridLayout(1,0));
+    JPanel panelSliders = new JPanel(new GridLayout(1, 0));
+    JPanel panelDropdown = new JPanel(new GridLayout(0, 1));
+    JPanel panelToggles = new JPanel(new GridLayout(1, 0));
+    JPanel panelSensor = new JPanel(new GridLayout(1, 0));
+
     JPanel panelSliderComponent = new JPanel();
     JPanel panelDropdownComponent = new JPanel();
     JPanel panelTogglesComponent = new JPanel();
-    JPanel panelSensorComponent = new JPanel(new GridLayout(0,1));
-
+    JPanel panelSensorComponent = new JPanel(new GridLayout(0, 1));
 
     public CustomControlPanel(String controlId) {
         this.controlId = controlId;
-        this.setLayout(new GridLayout(1,0));
+        this.setLayout(new GridLayout(1, 0));
 
         Border borderSliders = BorderFactory.createTitledBorder("Sliders");
         Border bordeDropdown = BorderFactory.createTitledBorder("Dropdown");
@@ -34,6 +36,7 @@ public class CustomControlPanel extends JPanel {
         panelDropdown.setBorder(bordeDropdown);
         panelToggles.setBorder(borderToggles);
         panelSensor.setBorder(borderSensor);
+
         panelSliders.add(panelSliderComponent);
         panelDropdown.add(panelDropdownComponent);
         panelToggles.add(panelTogglesComponent);
@@ -53,19 +56,19 @@ public class CustomControlPanel extends JPanel {
         this.controlId = controlId;
     }
 
-    public void addSlidersToPanel(JSlider slider){
+    public void addSlidersToPanel(JSlider slider) {
         this.panelSliderComponent.add(slider);
     }
 
-    public void addDropdownToPanel(JComboBox dropdown){
+    public void addDropdownToPanel(JComboBox dropdown) {
         this.panelDropdownComponent.add(dropdown);
     }
 
-    public void addToggleToPanel(JToggleButton toggle){
+    public void addToggleToPanel(JToggleButton toggle) {
         this.panelTogglesComponent.add(toggle);
     }
 
-    public void addSensorToPanel(JLabel sensorLabel){
+    public void addSensorToPanel(JLabel sensorLabel) {
         this.panelSensorComponent.add(sensorLabel);
     }
 

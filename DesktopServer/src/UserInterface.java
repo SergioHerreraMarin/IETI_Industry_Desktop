@@ -13,7 +13,6 @@ import java.util.Map;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -71,7 +70,7 @@ public class UserInterface extends JFrame {
 
         this.add(scrollPanel, BorderLayout.CENTER);
         this.setVisible(true);
-        
+
     }
 
     private void createMenuBar() {
@@ -116,28 +115,29 @@ public class UserInterface extends JFrame {
 
     private void loadControls() {
 
-        for(JComponent component : model.getCustomComponents()) {
+        for (JComponent component : model.getCustomComponents()) {
 
-            if(component instanceof CustomSlider) {
+            if (component instanceof CustomSlider) {
 
                 for (CustomControlPanel controlPanel : model.getControlBlockData()) {
                     if (controlPanel.getControlId().equals(((CustomSlider) component).getBlock())) {
                         controlPanel.addSlidersToPanel(((CustomSlider) component));
                     }
                 }
-            
+
                 ((CustomSlider) component).addMouseListener(new MouseInputAdapter() {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         ((CustomSlider) component).setDefaultValue(((CustomSlider) component).getValue());
                         String data;
-                        data = "blockID:" + ((CustomSlider)component).getBlock() + "!id:" + ((CustomSlider)component).getId() + "!current:" + ((CustomSlider)component).getDefaultValue();
-                        Servidor.updateClientComponents(data);   
+                        data = "blockID:" + ((CustomSlider) component).getBlock() + "!id:"
+                                + ((CustomSlider) component).getId() + "!current:"
+                                + ((CustomSlider) component).getDefaultValue();
+                        Servidor.updateClientComponents(data);
                     }
                 });
 
-            }else if(component instanceof CustomSwitch) {
-
+            } else if (component instanceof CustomSwitch) {
 
                 for (CustomControlPanel controlPanel : model.getControlBlockData()) {
                     if (controlPanel.getControlId().equals(((CustomSwitch) component).getBlock())) {
@@ -157,33 +157,37 @@ public class UserInterface extends JFrame {
                         }
 
                         ((CustomSwitch) component).setDefaultValue(toggleValue);
-                        
+
                         String data;
-                        data = "blockID:" + ((CustomSwitch)component).getBlock() + "!id:" + ((CustomSwitch)component).getId() + "!current:" + ((CustomSwitch)component).getDefaultValue();
+                        data = "blockID:" + ((CustomSwitch) component).getBlock() + "!id:"
+                                + ((CustomSwitch) component).getId() + "!current:"
+                                + ((CustomSwitch) component).getDefaultValue();
                         Servidor.updateClientComponents(data);
                     }
                 });
 
-            }else if(component instanceof CustomDropdown) {
+            } else if (component instanceof CustomDropdown) {
 
                 for (CustomControlPanel controlPanel : model.getControlBlockData()) {
                     if (controlPanel.getControlId().equals(((CustomDropdown) component).getBlock())) {
                         controlPanel.addDropdownToPanel(((CustomDropdown) component));
                     }
                 }
-                    
+
                 ((CustomDropdown) component).addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         ((CustomDropdown) component).setDefaultValue(((CustomDropdown) component).getSelectedIndex());
 
                         String data;
-                        data = "blockID:" + ((CustomDropdown)component).getBlock() + "!id:" + ((CustomDropdown)component).getId() + "!current:" + ((CustomDropdown)component).getDefaultValue();
+                        data = "blockID:" + ((CustomDropdown) component).getBlock() + "!id:"
+                                + ((CustomDropdown) component).getId() + "!current:"
+                                + ((CustomDropdown) component).getDefaultValue();
                         Servidor.updateClientComponents(data);
                     }
                 });
 
-            }else if(component instanceof CustomSensor) {
+            } else if (component instanceof CustomSensor) {
 
                 ArrayList<JLabel> sensorData = ((CustomSensor) component).createCustomSensor();
 
@@ -195,7 +199,7 @@ public class UserInterface extends JFrame {
                     }
                 }
 
-            }else{
+            } else {
                 System.out.println("Clase no encontrada");
             }
         }
@@ -208,7 +212,7 @@ public class UserInterface extends JFrame {
         GUISnapshot();
     }
 
-    public void GUISnapshot(){
+    public void GUISnapshot() {
         panelSnapshot = new JPanel();
 
         // SNAPSHOTS
@@ -238,13 +242,12 @@ public class UserInterface extends JFrame {
         panelExterior.revalidate();
     }
 
-
     private void initInterface() {
         this.setSize(WIDTH, HEIGHT);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    public void guardarInstancia(){
+    public void guardarInstancia() {
         String snapshotName = "";
         // Se conecta a esa base de datos
         Connection conn = UtilsSQLite.connect(filePath);
@@ -253,7 +256,7 @@ public class UserInterface extends JFrame {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         String dataInstancia = LocalDateTime.now().toString().replace("T", " ");
 
-        while (snapshotName.equals("") || snapshotName.length() < 3) {
+        while (snapshotName.equals("")) {
             snapshotName = JOptionPane.showInputDialog("Insert a name for the snapshot:");
         }
 
@@ -267,47 +270,47 @@ public class UserInterface extends JFrame {
     }
 
     public void loadSnapshot(int id) {
-    	Connection conn = UtilsSQLite.connect(filePath);
-    	
-    	ResultSet rs = UtilsSQLite.querySelect(conn, "select stateData from snapshot where id = "+ id +";");
-    	
-    	try {
-			while (rs.next()) {
-                if(rs.getString(1).split(";") != null){
+        Connection conn = UtilsSQLite.connect(filePath);
+
+        ResultSet rs = UtilsSQLite.querySelect(conn, "select stateData from snapshot where id = " + id + ";");
+
+        try {
+            while (rs.next()) {
+                if (rs.getString(1).split(";") != null) {
                     loadControlsSnapshot(rs.getString(1).split(";"));
                 }
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
-    public void loadControlsSnapshot(String[] controls){
+    public void loadControlsSnapshot(String[] controls) {
         resetPanels();
 
-        for(String control : controls){ //Por cada control crea uno.
+        for (String control : controls) { // Por cada control crea uno.
 
-            String[] componentsBlockid = control.split("¿"); //[0] = componente [1] bloque id
+            String[] componentsBlockid = control.split("¿"); // [0] = componente [1] bloque id
 
             CustomControlPanel customControl = new CustomControlPanel(componentsBlockid[1]);
 
             String components[] = componentsBlockid[0].split("%");
-            for(String component : components){
-                if(component.length() != 0){
+            for (String component : components) {
+                if (component.length() != 0) {
                     String keyValues[] = component.split(":");
-                    switch(keyValues[0]){
+                    switch (keyValues[0]) {
 
-                        case "CustomSlider": //KeyValues[1] para sacar los valores por defecto del componente actual.
+                        case "CustomSlider": // KeyValues[1] para sacar los valores por defecto del componente actual.
 
                             String sliderId = "", sliderBlock = "", sliderLabel = "";
                             float sliderDefaultValue = 5, sliderMin = 0, sliderMax = 10, sliderStep = 0;
 
                             String[] keyValuesSlider = keyValues[1].split(",");
-                            for(String keyValue: keyValuesSlider){
+                            for (String keyValue : keyValuesSlider) {
                                 String keysValues[] = keyValue.split("=");
 
-                                switch(keysValues[0].trim()){
+                                switch (keysValues[0].trim()) {
                                     case "id":
                                         sliderId = keysValues[1];
                                         break;
@@ -333,8 +336,9 @@ public class UserInterface extends JFrame {
                                         break;
                                 }
                             }
-                            //CREATE CUSTOM SLIDER
-                            CustomSlider slider = new CustomSlider(sliderId, sliderBlock, sliderLabel, sliderDefaultValue, sliderMin, sliderMax, sliderStep);
+                            // CREATE CUSTOM SLIDER
+                            CustomSlider slider = new CustomSlider(sliderId, sliderBlock, sliderLabel,
+                                    sliderDefaultValue, sliderMin, sliderMax, sliderStep);
                             snapshotComponents.add(slider);
                             break;
 
@@ -343,10 +347,10 @@ public class UserInterface extends JFrame {
                             String switchId = "", switchBlock = "", switchLabel = "", switchDefaultValue = "";
                             String[] keyValuesSwitch = keyValues[1].split(",");
 
-                            for(String keyValue: keyValuesSwitch){
+                            for (String keyValue : keyValuesSwitch) {
                                 String keysValues[] = keyValue.split("=");
 
-                                switch(keysValues[0].trim()){
+                                switch (keysValues[0].trim()) {
                                     case "id":
                                         switchId = keysValues[1];
                                         break;
@@ -363,21 +367,23 @@ public class UserInterface extends JFrame {
                                         break;
                                 }
                             }
-                            //CREATE CUSTOM SWITCH
-                            CustomSwitch switchs = new CustomSwitch(switchId, switchBlock, switchLabel, switchDefaultValue);
+                            // CREATE CUSTOM SWITCH
+                            CustomSwitch switchs = new CustomSwitch(switchId, switchBlock, switchLabel,
+                                    switchDefaultValue);
                             snapshotComponents.add(switchs);
                             break;
 
                         case "CustomSensor":
 
-                            String sensorId = "", sensorBlock = "", sensorLabel = "", sensorUnits = "", sensorThresholdlow = "", sensorThresholdhigh = "";
+                            String sensorId = "", sensorBlock = "", sensorLabel = "", sensorUnits = "",
+                                    sensorThresholdlow = "", sensorThresholdhigh = "";
                             String[] keyValuesSensor = keyValues[1].split(",");
 
-                            for(String keyValue: keyValuesSensor){
-                                
+                            for (String keyValue : keyValuesSensor) {
+
                                 String keysValues[] = keyValue.split("=");
 
-                                switch(keysValues[0].trim()){
+                                switch (keysValues[0].trim()) {
                                     case "id":
                                         sensorId = keysValues[1];
                                         break;
@@ -399,8 +405,9 @@ public class UserInterface extends JFrame {
                                         break;
                                 }
                             }
-                            //CREATE CUSTOM SENSOR
-                            CustomSensor sensor = new CustomSensor(sensorId, sensorBlock, sensorLabel, sensorUnits, sensorThresholdlow, sensorThresholdhigh);
+                            // CREATE CUSTOM SENSOR
+                            CustomSensor sensor = new CustomSensor(sensorId, sensorBlock, sensorLabel, sensorUnits,
+                                    sensorThresholdlow, sensorThresholdhigh);
                             customControl.addSensorToPanel(sensor);
                             break;
 
@@ -412,10 +419,10 @@ public class UserInterface extends JFrame {
 
                             String[] keyValuesDropdown = keyValues[1].split(",");
 
-                            for(String keyValue: keyValuesDropdown){
+                            for (String keyValue : keyValuesDropdown) {
                                 String keysValues[] = keyValue.split("=");
 
-                                switch(keysValues[0].trim()){
+                                switch (keysValues[0].trim()) {
                                     case "id":
                                         dropdownId = keysValues[1];
                                         break;
@@ -430,7 +437,7 @@ public class UserInterface extends JFrame {
                                         break;
                                     case "options":
                                         String[] optionsValues = keysValues[1].split("!");
-                                        for(int i = 0; i < optionsValues.length; i++){
+                                        for (int i = 0; i < optionsValues.length; i++) {
                                             dropdownOptions.add(optionsValues[i]);
                                         }
                                         break;
@@ -438,8 +445,9 @@ public class UserInterface extends JFrame {
                                         break;
                                 }
                             }
-                            //CREATE CUSTOM DROPDOWN
-                            CustomDropdown dropdown = new CustomDropdown(dropdownId, dropdownBlock, dropdownLabel, dropdownDefaultValue, dropdownOptions);
+                            // CREATE CUSTOM DROPDOWN
+                            CustomDropdown dropdown = new CustomDropdown(dropdownId, dropdownBlock, dropdownLabel,
+                                    dropdownDefaultValue, dropdownOptions);
                             snapshotComponents.add(dropdown);
                             break;
                         default:
@@ -449,7 +457,7 @@ public class UserInterface extends JFrame {
             }
             model.customControls.add(customControl);
         }
-        
+
         model.setCustomComponents(snapshotComponents);
         loadControls();
     }
@@ -458,29 +466,29 @@ public class UserInterface extends JFrame {
         Connection connSnapshot = UtilsSQLite.connect(filePath);
         ResultSet infoSnapshot = UtilsSQLite.querySelect(connSnapshot, "SELECT id,name FROM snapshot;");
 
-        HashMap<Integer,String> snapshots = new HashMap<Integer,String>();
+        HashMap<Integer, String> snapshots = new HashMap<Integer, String>();
         ArrayList<Integer> ids = new ArrayList<Integer>();
         ArrayList<String> values = new ArrayList<String>();
 
         try {
-			while (infoSnapshot.next()) {
-				snapshots.put(infoSnapshot.getInt(1), infoSnapshot.getString(2));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-        
+            while (infoSnapshot.next()) {
+                snapshots.put(infoSnapshot.getInt(1), infoSnapshot.getString(2));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         // Layout Snapshot
         JFrame snapshotSelection = new JFrame("Load Snapshot");
         int height = 0;
         int numSnapshots = 0;
         JPanel contentPane = new JPanel();
-        contentPane.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
+        contentPane.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         snapshotSelection.setContentPane(contentPane);
-        
-        // Label 
+
+        // Label
         JLabel labelSnapshot = new JLabel("Select a snapshot to load:  ");
-		labelSnapshot.setHorizontalAlignment(SwingConstants.CENTER);
+        labelSnapshot.setHorizontalAlignment(SwingConstants.CENTER);
         contentPane.add(labelSnapshot, BorderLayout.NORTH);
 
         // Lista de snapshots
@@ -491,46 +499,43 @@ public class UserInterface extends JFrame {
         pSnapshots.setLayout(new BoxLayout(pSnapshots, BoxLayout.Y_AXIS));
 
         for (Map.Entry<Integer, String> s : snapshots.entrySet()) {
-			values.add(s.getValue());
-			ids.add(s.getKey());
+            values.add(s.getValue());
+            ids.add(s.getKey());
             numSnapshots++;
-		}
-        
-        height = (numSnapshots * 100) - 10;
+        }
 
+        height = (numSnapshots * 70) - (numSnapshots - 10);
 
         JList listSnapshots = new JList();
-		listSnapshots.setListData(values.toArray());
-		listSnapshots.setFixedCellHeight(30);
-		listSnapshots.setFixedCellWidth(this.getWidth()-40);
+        listSnapshots.setListData(values.toArray());
+        listSnapshots.setFixedCellHeight(30);
+        listSnapshots.setFixedCellWidth(this.getWidth() - 40);
         listSnapshots.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         pSnapshots.add(listSnapshots);
         contentPane.add(scrollSnapshots, BorderLayout.CENTER);
-		
-		DefaultListCellRenderer renderer = (DefaultListCellRenderer) listSnapshots.getCellRenderer();
-		renderer.setHorizontalAlignment(SwingConstants.CENTER);
-		
+
+        DefaultListCellRenderer renderer = (DefaultListCellRenderer) listSnapshots.getCellRenderer();
+        renderer.setHorizontalAlignment(SwingConstants.CENTER);
+
         // Botón
         JButton selection = new JButton("Select");
         selection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int id = ids.get(values.indexOf(listSnapshots.getSelectedValue()));
-                loadSnapshot(id);
-
                 try {
-                    int res = JOptionPane.showOptionDialog(null, "Snapshot loaded correctly", "Load Snapshot", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
-                    if(res == JOptionPane.OK_OPTION){
-                        snapshotSelection.dispose();
-                    }
+                    int id = ids.get(values.indexOf(listSnapshots.getSelectedValue()));
+                    loadSnapshot(id);
                 } catch (Exception e1) {
-                    e1.printStackTrace();
+                    // TODO: handle exception
+                } finally {
+                    snapshotSelection.setVisible(false);
                 }
             }
         });
 
         contentPane.add(selection, BorderLayout.SOUTH);
+        snapshotSelection.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         snapshotSelection.setVisible(true);
         snapshotSelection.setSize(new Dimension(300, height));
     }
